@@ -1,0 +1,21 @@
+# Node / 前端
+node_modules/
+package-lock.json
+
+# Python
+__pycache__/
+*.pyc
+
+# 临时文件
+_check.js
+*.log
+
+# 系统
+Thumbs.db
+desktop.ini
+
+# 生成物（可重新生成）
+*.pptx
+
+# 密钥
+zhipu.key
