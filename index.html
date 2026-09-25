@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>卡路里之路 · AI 减肥系统 Demo</title>
+<style>
+:root{
+  --dark:#0f2e2a; --primary:#1f6e5c; --green2:#2e8b74; --accent:#ff7a45;
+  --light:#f4f7f6; --white:#fff; --text:#1a1a1a; --gray:#6b7774;
+  --line:#e3eae7; --danger:#c03a2b; --gold:#f0a500;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:system-ui,-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;
+  background:linear-gradient(160deg,#0f2e2a 0%,#123c33 40%,#1f6e5c 100%);
+  color:var(--text); display:flex; justify-content:center; align-items:flex-start;
+  min-height:100vh; padding:24px 12px;
+}
+#app{width:100%;max-width:920px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{width:38px;height:38px;border-radius:10px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px}
+.brand h1{color:#fff;font-size:18px;font-weight:800;letter-spacing:.5px}
+.brand p{color:#bfd6d1;font-size:11px;margin-top:2px}
+.keybox{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.keybox input{width:210px;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.12);color:#fff;font-size:12px;outline:none}
+.keybox input::placeholder{color:#bfd6d1}
+.keybox button{padding:9px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;
+  font-size:12px;font-weight:700;cursor:pointer}
+.keybox button:hover{filter:brightness(1.08)}
+.mapmode{font-size:11px;color:#bfd6d1;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.1)}
+.mapmode.on{color:#ffe9dd;background:rgba(255,122,69,.25)}
+.steps{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.step{flex:1;min-width:80px;padding:10px 6px;text-align:center;border-radius:10px;background:rgba(255,255,255,.1);
+  color:#bfd6d1;font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.step .n{display:block;font-size:10px;opacity:.7;margin-bottom:2px}
+.step.active{background:var(--accent);color:#fff}
+.step.done{background:rgba(46,139,116,.55);color:#fff}
+.card{background:var(--white);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);margin-bottom:14px}
+.card h2{font-size:18px;color:var(--dark);margin-bottom:4px}
+.card h3{font-size:15px;color:var(--dark);margin:16px 0 8px}
+.card .sub{font-size:12px;color:var(--gray);margin-bottom:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.col{flex:1;min-width:170px}
+label{display:block;font-size:12px;color:var(--gray);margin-bottom:6px;font-weight:600}
+input[type=number],select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+  font-size:15px;outline:none;background:#fbfdfc}
+input[type=number]:focus,select:focus{border-color:var(--primary)}
+.btn{display:inline-block;padding:12px 22px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--light);color:var(--primary)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.big-num{font-size:34px;font-weight:800;color:var(--primary)}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.tag.green{background:#e3f2ec;color:var(--primary)}
+.tag.orange{background:#ffe9dd;color:var(--accent)}
+.tag.red{background:#fde8e5;color:var(--danger)}
+/* 计划 */
+.budget-bar{background:var(--light);border-radius:12px;padding:14px;display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.budget-bar .b{flex:1;text-align:center}
+.budget-bar .v{font-size:24px;font-weight:800;color:var(--primary)}
+.budget-bar .l{font-size:11px;color:var(--gray);margin-top:2px}
+.meal{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+.meal .icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.meal .b{background:#fdeecd}.meal .l{background:#ffe9dd}.meal .d{background:#e3f2ec}
+.meal .info{flex:1}
+.meal .m-name{font-size:15px;font-weight:700}
+.meal .m-sub{font-size:11px;color:var(--gray);margin-top:2px}
+.meal .kcal{font-weight:800;font-size:16px;color:var(--primary)}
+.meal.lunch{border:2px solid var(--accent);background:#fff7f2}
+.upgrade-btn{margin-top:8px;padding:10px 18px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.upgrade-btn:hover{filter:brightness(1.06)}
+.task{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--light);border-radius:10px;margin-bottom:6px}
+.task .t-name{flex:1;font-size:14px;font-weight:600}
+.task .t-kcal{font-weight:800;color:var(--primary);font-size:13px}
+.loan-warn{background:#fde8e5;border:1px solid #f5c6bf;color:var(--danger);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+/* 地图 */
+#mapwrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);height:340px;background:#e8efec}
+#map{width:100%;height:100%}
+#mockmap{width:100%;height:100%;background:linear-gradient(135deg,#dcebe5,#cfe2da)}
+.mock-note{position:absolute;top:10px;left:10px;background:rgba(15,46,42,.85);color:#fff;font-size:11px;
+  padding:6px 10px;border-radius:8px;z-index:5}
+.shop-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.shop{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;
+  cursor:pointer;transition:.15s}
+.shop:hover{border-color:var(--primary);background:#f6fbf9}
+.shop.sel{border-color:var(--primary);background:#eef7f3;box-shadow:0 0 0 2px var(--primary) inset}
+.shop .rank{font-size:20px;font-weight:800;color:var(--gray);width:28px;text-align:center}
+.shop .rank.top{color:var(--accent)}
+.shop .info{flex:1}
+.shop .name{font-size:15px;font-weight:700;color:var(--text)}
+.shop .dish{font-size:12px;color:var(--gray);margin-top:2px}
+.shop .kcal{font-weight:800;font-size:16px;color:var(--accent)}
+.shop .kcal small{font-size:11px;color:var(--gray);font-weight:400}
+.shop .dist{font-size:12px;color:var(--primary);font-weight:600;text-align:right}
+.shop-menu{display:none;background:#fbfdfc;border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:10px 12px;margin:-4px 0 8px}
+.shop-menu.open{display:block}
+.sm-title{font-size:11px;color:var(--gray);margin-bottom:6px}
+.sm-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.sm-row:last-of-type{border-bottom:none}
+.sm-row b{color:var(--accent)}
+.extra-warn{background:#fff3cd;border:1px solid #ffe08a;color:#8a6d00;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;margin-top:12px}
+.extra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.extra-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.extra-row{display:flex;align-items:center;gap:10px;background:#fde8e5;border:1px solid #f5c6bf;border-radius:10px;padding:8px 12px;font-size:13px}
+.extra-row .er-n{flex:1;font-weight:600}
+.extra-row .er-k{color:var(--danger);font-weight:700}
+.extra-row .er-x{cursor:pointer;color:var(--danger);font-weight:800;padding:0 4px}
+.photo-box{display:flex;align-items:center;gap:12px;background:var(--light);border-radius:10px;padding:10px;margin-top:8px}
+.photo-box img{width:96px;height:96px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.ai-analyzing{font-size:13px;color:var(--gray);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.timer{font-size:52px;font-weight:800;color:var(--dark);text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--light);border-radius:12px;padding:12px;text-align:center}
+.stat .v{font-size:20px;font-weight:800;color:var(--primary)}
+.stat .l{font-size:11px;color:var(--gray);margin-top:3px}
+.menu-item{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.menu-item.sel{border-color:var(--primary);background:#eef7f3}
+.menu-item .ck{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+.menu-item.sel .ck{background:var(--primary);border-color:var(--primary)}
+.menu-item .nm{flex:1;font-size:14px;font-weight:600}
+.menu-item .kcal{font-weight:800;color:var(--accent)}
+.result-box{background:var(--dark);border-radius:14px;padding:20px;color:#fff;margin-bottom:14px}
+.result-box .lbl{font-size:12px;color:#bfd6d1}
+.balance{display:flex;gap:12px;margin:14px 0}
+.balance .box{flex:1;border-radius:12px;padding:14px;text-align:center}
+.balance .deposit{background:rgba(46,139,116,.25)}
+.balance .loan{background:rgba(192,58,43,.25)}
+.balance .v{font-size:26px;font-weight:800}
+.balance .deposit .v{color:#5fd4b2}
+.balance .loan .v{color:#ff9a86}
+.gauge{height:12px;border-radius:8px;background:rgba(255,255,255,.15);overflow:hidden;margin:6px 0}
+.gauge .fill{height:100%;border-radius:8px;transition:width .4s}
+.rank-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;background:var(--light)}
+.rank-row.me{background:#eef7f3;border:1px solid var(--primary)}
+.rank-row .pos{width:26px;font-weight:800;color:var(--gray);text-align:center}
+.rank-row .pos.gold{color:var(--gold)}
+.rank-row .nm{flex:1;font-weight:600;font-size:14px}
+.rank-row .val{font-weight:800;color:var(--primary)}
+.hidden{display:none}
+.hint{font-size:12px;color:var(--gray);line-height:1.6}
+.foot{text-align:center;color:#bfd6d1;font-size:11px;margin:20px 0;line-height:1.6}
+.rank-row{cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:#fbfdfc;font-size:12px;cursor:pointer;user-select:none}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.rank-detail{display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:-2px 0 10px 36px}
+.rank-detail.open{display:block}
+.rank-detail .d-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.rank-detail .story{font-size:12px;color:var(--gray);line-height:1.5;margin-top:4px}
+.toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:var(--dark);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">卡</div>
+      <div>
+        <h1>卡路里之路</h1>
+        <p>为爱吃的东西，付出有意义努力</p>
+      </div>
+    </div>
+    <div class="keybox">
+      <input id="amapKey" type="text" placeholder="高德 Key" value="e03e8a0de0a2635124a89e23ab310039">
+      <input id="amapSec" type="text" placeholder="安全密钥" value="7b6abb2b1a0927bd968dbb2b5596586e" style="width:150px">
+      <input id="aiBase" type="text" placeholder="AI识卡接口地址" value="https://1491066761-4ldf82hh5j.ap-nanjing.tencentscf.com" style="width:170px">
+      <button id="connectBtn">连接高德</button>
+      <span id="mapmode" class="mapmode">演示模式</span>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step active" data-step="0"><span class="n">①</span>画像</div>
+    <div class="step" data-step="1"><span class="n">②</span>计划</div>
+    <div class="step" data-step="2"><span class="n">③</span>地图</div>
+    <div class="step" data-step="3"><span class="n">④</span>出发</div>
+    <div class="step" data-step="4"><span class="n">⑤</span>点菜记账</div>
+    <div class="step" data-step="5"><span class="n">⑥</span>余卡排行</div>
+  </div>
+
+  <!-- Step 0 画像 -->
+  <div class="card" id="step0">
+    <h2>先认识一下你</h2>
+    <div class="sub">AI 采集信息后，会生成你的每日食谱与运动任务</div>
+    <div class="row">
+      <div class="col"><label>当前体重 (kg)</label><input id="pWeight" type="number" value="100"></div>
+      <div class="col"><label>目标体重 (kg)</label><input id="pGoal" type="number" value="75"></div>
+      <div class="col"><label>希望多久瘦到目标</label>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input id="pDuration" type="number" value="6" min="1" max="36" style="flex:1">
+          <span style="font-size:13px;color:var(--gray);white-space:nowrap">个月</span>
+        </div>
+      </div>
+      <div class="col"><label>身高 (cm)</label><input id="pHeight" type="number" value="170"></div>
+      <div class="col"><label>年龄</label><input id="pAge" type="number" value="30"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="col"><label>口味偏好</label>
+        <select id="pTaste"><option>爱吃烤肉</option><option>爱吃火锅</option><option>爱吃面食</option><option>爱吃轻食</option></select>
+      </div>
+      <div class="col" style="flex:2"><label>运动偏好（可多选）</label>
+        <div class="chips" id="pSportChips"></div>
+      </div>
+      <div class="col"><label>运动接受度</label>
+        <select id="pExercise"><option>愿意多走多跑</option><option>一般</option><option>尽量少动</option></select>
+      </div>
+      <div class="col"><label>少吃比例</label>
+        <select id="pEat"><option>正常吃</option><option>少量控制</option><option>严格控制</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="goStep(1)">生成我的食谱与运动任务 →</button>
+  </div>
+
+  <!-- Step 1 计划 -->
+  <div class="card hidden" id="step1">
+    <h2>你的今日计划</h2>
+    <div class="sub" id="planSub"></div>
+    <div id="loanWarn"></div>
+    <div id="planWarn"></div>
+    <div class="budget-bar" id="budgetBar"></div>
+    <div id="mealCards"></div>
+    <h3>今日运动任务</h3>
+    <div id="exerciseList"></div>
+    <h3>赚余量 · 今日运动</h3>
+    <div class="sub">除了走路去店，其它运动也能赚余量，直接加进你的可吃额度；微信步数会自动扣除今日任务的步数，避免重复计算</div>
+    <div class="row">
+      <div class="col"><label>微信步数（步）</label><input id="eSteps" type="number" placeholder="如 8000"></div>
+      <div class="col"><label>运动项目</label><select id="eSport"></select></div>
+      <div class="col"><label>时长（分钟）</label><input id="eMin" type="number" placeholder="如 30"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-primary" onclick="addEarned()">＋ 记这笔运动</button>
+      <input id="eOther" type="text" placeholder="其它运动自由填：游泳30分钟 / 跳绳1000个 / 打篮球1小时" style="flex:1;min-width:220px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none">
+      <button class="btn btn-ghost" onclick="parseFreeEarned()">AI 估其它</button>
+    </div>
+    <div style="margin-top:8px">
+      <span id="earnedShow" class="hint">今日已赚余量：<b style="color:var(--green2)">+0</b> 千卡</span>
+      <span id="earnedDetail" class="hint"></span>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-ghost" onclick="goStep(0)">← 修改画像</button>
+      <button class="btn btn-accent" style="flex:1" onclick="goStep(2)">直接进地图逛逛 →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 地图 -->
+  <div class="card hidden" id="step2">
+    <h2 id="mapTitle">附近有什么？</h2>
+    <div class="sub" id="mapSub">淘宝式排序：招牌最低卡路里排前面。点一家店看距离和路线</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+      <input id="foodSearch" placeholder="想吃啥？搜：烤肉 / 火锅 / 奶茶 / 面…" style="flex:1;min-width:180px;padding:11px 12px;border:1px solid var(--accent);border-radius:10px;font-size:14px;outline:none">
+      <button class="btn btn-accent" onclick="searchFood()">搜好吃的</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+      <label style="font-size:13px;color:var(--gray);font-weight:600;white-space:nowrap">偏好距离</label>
+      <select id="distFilter" style="flex:1;min-width:140px">
+        <option value="all">距离不限</option>
+        <option value="500">500m 内</option>
+        <option value="1000">1km 内</option>
+        <option value="1-3k">1~3km</option>
+        <option value="3-5k">3~5km</option>
+      </select>
+    </div>
+    <div id="mapwrap">
+      <div id="map" class="hidden"></div>
+      <div id="mockmap"></div>
+      <div class="mock-note" id="mapnote">定位中…</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+      <input id="locSearch" placeholder="搜索城市/地址，纠正定位" style="flex:1;min-width:180px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none">
+      <button class="btn btn-ghost" onclick="searchLocation()">搜索</button>
+      <button class="btn btn-ghost" onclick="relocate()">定位我</button>
+    </div>
+    <div class="hint" id="locInfo" style="margin-top:6px">提示：桌面浏览器定位可能不准，可搜索城市/地址，或直接点地图设「我」的位置</div>
+    <div class="shop-list" id="shopList"></div>
+    <div style="margin-top:14px;display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="goStep(1)">← 返回计划</button>
+      <button class="btn btn-primary" style="flex:1" id="toStep3" disabled onclick="goStep(3)">就它了，规划出发 →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 出发 -->
+  <div class="card hidden" id="step3">
+    <h2>出发去：<span id="destName" style="color:var(--accent)"></span></h2>
+    <div class="sub">距离 <b id="destDist"></b> 米。选到达方式，开始计时，走到店为止</div>
+    <div class="row" style="margin-bottom:14px">
+      <div class="col"><label>到达方式</label>
+        <select id="travelMode"><option value="walk">走路</option><option value="run">跑步</option><option value="bike">骑车</option></select>
+      </div>
+    </div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stats">
+      <div class="stat"><div class="v" id="sDist">0</div><div class="l">距离 (米)</div></div>
+      <div class="stat"><div class="v" id="sSpeed">0</div><div class="l">配速 (km/h)</div></div>
+      <div class="stat"><div class="v" id="sCal">0</div><div class="l">已消耗 (千卡)</div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:6px;font-size:14px;color:var(--gray)">
+      原额度 <b id="baseBudget" style="color:var(--primary)">500</b> ＋ 走到店 <b id="liveBurn" style="color:var(--accent)">0</b> ＋ 今日运动 <b id="liveEarned" style="color:var(--accent)">0</b> ＝ 可吃 <b id="liveBudget" style="color:var(--accent);font-size:18px">500</b> 千卡
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-accent" id="startBtn" onclick="startTrip()">开始计时</button>
+      <button class="btn btn-primary hidden" id="arriveBtn" onclick="arrive()">我到了，停止计时</button>
+      <button class="btn btn-ghost" id="simBtn" onclick="simArrive()">模拟到店（演示）</button>
+      <button class="btn btn-ghost" onclick="goStep(2)">← 重新选店</button>
+    </div>
+  </div>
+
+  <!-- Step 4 点菜记账 -->
+  <div class="card hidden" id="step4">
+    <h2 id="orderTitle">点菜（拍照估卡）</h2>
+    <div class="sub">选菜 + 饮料零食，全部摄入都要记，别漏记</div>
+    <div class="result-box" id="burnBox"></div>
+    <div id="menuList"></div>
+    <div style="display:flex;gap:8px;margin:12px 0 6px">
+      <button class="btn btn-accent" style="flex:1" onclick="openCamera()">📷 拍照测卡路里</button>
+      <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+    </div>
+    <div id="photoResult" class="hidden"></div>
+    <div class="extra-warn">⚠ 小食物可能有大热量！饮料、零食都要标记</div>
+    <h3 style="font-size:14px;color:var(--dark);margin:14px 0 8px">额外摄入（饮料/零食）</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <label style="font-size:13px;color:var(--gray);font-weight:600;white-space:nowrap">常见零食</label>
+      <select id="extraSelect" style="flex:1;min-width:160px"></select>
+      <button class="btn btn-ghost" onclick="addExtraFromSelect()">＋添加</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+      <input id="extraName" type="text" placeholder="自填名称" style="flex:1;min-width:140px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none">
+      <input id="extraKcal" type="number" placeholder="千卡" style="width:90px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none">
+      <button class="btn btn-ghost" onclick="addExtraManual()">＋添加</button>
+    </div>
+    <div class="hint" style="margin-top:6px">📋 包装食品看「营养成分表」里的『能量』（按每100克/每份标注），按你实际吃的量换算；若标的是千焦(kJ)，÷4.18 就是千卡</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-accent" style="flex:1" onclick="openExtraCamera()">📷 拍照识别零食</button>
+      <input type="file" id="extraPhotoInput" accept="image/*" capture="environment" class="hidden">
+    </div>
+    <div id="extraPhotoResult" class="hidden"></div>
+    <div class="extra-list" id="extraList"></div>
+    <div id="resultBox" class="hidden"></div>
+    <div style="margin-top:14px;display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="goStep(3)">← 重新计时</button>
+      <button class="btn btn-accent" style="flex:1" id="settleBtn" disabled onclick="settle()">记这笔账 →</button>
+    </div>
+  </div>
+
+  <!-- Step 5 余卡排行 -->
+  <div class="card hidden" id="step5">
+    <h2>我的余卡</h2>
+    <div class="sub">余卡 = 运动消耗 − 吃掉。存款让你随时能吃顿好的，借款会收紧下次额度</div>
+    <div class="result-box" id="balanceBox"></div>
+    <div class="balance">
+      <div class="box deposit"><div class="lbl">存款（余卡）</div><div class="v" id="totalDeposit">0</div></div>
+      <div class="box loan"><div class="lbl">借款</div><div class="v" id="totalLoan">0</div></div>
+    </div>
+    <h2 style="margin-top:8px">余卡排行榜 · 本月最终余卡（模拟）</h2>
+    <div class="sub">存钱基因：数字摆在那，就想让它变大。点开任意一行看成功率</div>
+    <div id="rankList"></div>
+    <button class="btn btn-accent btn-block" style="margin:14px 0" onclick="shareResult()">📤 分享我的成绩</button>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-ghost" onclick="goStep(1)">← 回到计划（借款已收紧额度）</button>
+      <button class="btn btn-primary" style="flex:1" onclick="resetDemo()">再来一轮 →</button>
+    </div>
+  </div>
+
+  <div class="foot">卡路里之路 · Demo　|　地图距离+时间算消耗 · 拍照估卡+成功率 · 余卡货币 · 排行榜<br>接入高德 JS API 后显示真实地图、POI 搜店与步行路径</div>
+</div>
+
+<script>
+/* ================= 全局状态 ================= */
+const state = {
+  profile:{weight:100,goal:75,durationMonths:6,height:170,age:30,taste:'爱吃烤肉',sports:['跑步'],exercise:'愿意多走多跑',eat:'正常吃'},
+  plan:null,
+  upgradeFrom:null,          // {meal, kcal} 升级来源（哪顿饭、原额度）
+  recommended:[],            // 从附近店挑出的推荐菜 [{shop,dish,kcal,dist,meal}]
+  distFilter:'all',
+  aiBase:'',
+  amapKey:'',
+  hasAmap:false,
+  amap:null, map:null,
+  location:null,            // null = 未定位
+  locating:false,
+  restaurants:[],
+  selected:null,
+  distance:0,
+  trip:{mode:'walk',start:0,elapsed:0,burn:0,speed:0,met:0},
+  order:{items:[],extras:[],intake:0},
+  balance:{deposit:0,loan:0,history:[]},
+  earnedSurplus:0, earnedLog:[],
+  timerId:null,
+};
+
+const DEFAULT_CENTER = {lng:116.397428, lat:39.90923}; // 仅定位全失败时兜底
+
+/* ================= 数据（模拟） ================= */
+const SAMPLE_SHOPS = [
+  {name:'轻食沙拉吧',  dish:'招牌鸡胸肉沙拉', kcal:320, menu:[
+    {n:'鸡胸肉沙拉', k:320},{n:'牛油果虾仁碗', k:410},{n:'希腊酸奶杯', k:180},{n:'藜麦饭团', k:300}]},
+  {name:'一口奶茶',    dish:'珍珠奶茶（少糖）', kcal:450, menu:[
+    {n:'珍珠奶茶少糖', k:450},{n:'无糖绿茶', k:20},{n:'芋圆豆花', k:380},{n:'黑糖鲜奶', k:520}]},
+  {name:'兰州牛肉面',  dish:'清汤牛肉面', kcal:550, menu:[
+    {n:'清汤牛肉面', k:550},{n:'干拌牛肉面', k:620},{n:'凉拌黄瓜', k:60},{n:'茶叶蛋', k:80}]},
+  {name:'炸鸡汉堡',    dish:'香辣炸鸡套餐', kcal:1200, menu:[
+    {n:'香辣炸鸡套餐', k:1200},{n:'原味鸡腿堡', k:640},{n:'薯条中份', k:340},{n:'无糖可乐', k:0}]},
+  {name:'韩式烤肉',    dish:'五花肉拼盘', kcal:1450, menu:[
+    {n:'五花肉100g', k:508},{n:'牛里脊100g', k:125},{n:'生菜包一份', k:60},{n:'石锅拌饭', k:650},{n:'冷面', k:400}]},
+  {name:'重庆火锅',    dish:'麻辣锅底+涮菜', kcal:1800, menu:[
+    {n:'麻辣锅底', k:800},{n:'肥牛卷100g', k:350},{n:'蔬菜拼盘', k:90},{n:'豆皮', k:120}]},
+];
+const MENU_DB = {
+  '烤肉': {menu:[{n:'牛里脊(100g)',k:125},{n:'烤鸡腿肉(100g)',k:165},{n:'烤蘑菇',k:80},{n:'生菜包(一份)',k:60},{n:'辣白菜',k:30},{n:'韩式冷面',k:400},{n:'猪五花(100g)',k:508},{n:'石锅拌饭',k:650}]},
+  '火锅': {menu:[{n:'虾滑(100g)',k:110},{n:'清汤锅底',k:120},{n:'蔬菜拼盘',k:90},{n:'豆皮(100g)',k:120},{n:'粉丝(100g)',k:335},{n:'肥牛卷(100g)',k:350},{n:'麻辣锅底',k:800}]},
+  '面馆': {menu:[{n:'凉拌黄瓜',k:60},{n:'茶叶蛋',k:80},{n:'素汤面',k:400},{n:'葱油拌面',k:540},{n:'清汤牛肉面',k:550},{n:'炸酱面',k:620}]},
+  '奶茶': {menu:[{n:'黑咖啡(无糖)',k:5},{n:'无糖绿茶',k:20},{n:'芋圆豆花',k:380},{n:'珍珠奶茶(少糖)',k:450},{n:'黑糖鲜奶',k:520}]},
+  '轻食': {menu:[{n:'蔬菜汤',k:90},{n:'希腊酸奶杯',k:180},{n:'藜麦饭团',k:300},{n:'鸡胸肉沙拉',k:320},{n:'牛油果虾仁碗',k:410}]},
+  '快餐': {menu:[{n:'无糖可乐',k:0},{n:'玉米杯',k:120},{n:'薯条(中)',k:340},{n:'原味鸡腿堡',k:640},{n:'香辣炸鸡套餐',k:1200}]},
+  '咖啡': {menu:[{n:'美式(无糖)',k:5},{n:'卡布奇诺',k:150},{n:'拿铁',k:180},{n:'牛角包',k:280},{n:'三明治',k:350}]},
+  '中餐': {menu:[{n:'番茄蛋汤',k:90},{n:'白灼虾(100g)',k:99},{n:'清炒时蔬',k:150},{n:'米饭(一碗)',k:230},{n:'宫保鸡丁',k:380},{n:'红烧肉(100g)',k:520}]},
+};
+function matchMenu(name, type){
+  const s=(name||'')+(type||'');
+  const rules=[['烤肉','烤肉'],['烧烤','烤肉'],['火锅','火锅'],['麻辣烫','火锅'],['串串','火锅'],['拉面','面馆'],['面','面馆'],['米线','面馆'],['粉','面馆'],['饺子','面馆'],['奶茶','奶茶'],['咖啡','咖啡'],['沙拉','轻食'],['轻食','轻食'],['三明治','轻食'],['汉堡','快餐'],['炸鸡','快餐'],['快餐','快餐'],['寿司','中餐'],['日料','中餐'],['川菜','中餐'],['粤菜','中餐'],['湘菜','中餐'],['小吃','中餐']];
+  for(const [w,cat] of rules){ if(s.includes(w)) return cat; }
+  return '中餐';
+}
+const RECIPE_DB = {
+  '爱吃烤肉': {b:'燕麦粥 + 水煮蛋', l:'鸡胸肉蔬菜碗（低卡版）', d:'烤鱼 + 西兰花', upgrade:'韩式烤肉'},
+  '爱吃火锅': {b:'豆浆 + 全麦包', l:'清汤蔬菜锅', d:'豆腐菌菇锅', upgrade:'重庆火锅'},
+  '爱吃面食': {b:'小米粥 + 鸡蛋', l:'荞麦面 + 鸡丝', d:'蔬菜汤面', upgrade:'兰州牛肉面'},
+  '爱吃轻食': {b:'酸奶 + 水果', l:'鸡胸肉沙拉', d:'虾仁藜麦碗', upgrade:'轻食沙拉'},
+};
+const EXERCISE_PREF_DB = {
+  '跑步': [['慢跑',7.5,20,0],['快走热身',4.5,10,1000]],
+  '快走/走路': [['快走',4.5,40,4000]],
+  '游泳': [['游泳',8.3,30,0]],
+  '骑车': [['骑车',6.5,30,0]],
+  '健身/力量': [['力量训练',5,30,0],['拉伸',2.5,10,0]],
+  '球类': [['打篮球',6.5,30,0],['羽毛球',5.5,30,0]],
+  '瑜伽/普拉提': [['瑜伽',3,40,0],['普拉提',3,30,0]],
+};
+const SPORT_OPTIONS = Object.keys(EXERCISE_PREF_DB);
+const WILL_FACTOR = {'愿意多走多跑':1.5, '一般':1.0, '尽量少动':0.6};
+const ACTIVITIES = [
+  ['散步',3],['快走',4.5],['慢跑',7.5],['跑步',8.3],['游泳',8.3],['骑车',6.5],
+  ['跳绳',11],['篮球',6.5],['羽毛球',5.5],['乒乓球',4.5],['足球',7],['瑜伽',3],
+  ['力量训练',5],['健身',5],['爬山',6.5],['跳舞',5.5],['广场舞',4],['椭圆机',5],
+  ['划船机',7],['爬楼梯',8],['拳击',10],['HIIT',10],['普拉提',3],
+];
+const EXTRA_DB = [
+  {n:'可乐(330ml)', k:140},{n:'奶茶(中杯全糖)', k:450},{n:'无糖茶饮', k:0},
+  {n:'薯片(一包)', k:540},{n:'巧克力(50g)', k:280},{n:'饼干(4片)', k:200},
+  {n:'蛋糕(一块)', k:350},{n:'冰淇淋(一个)', k:250},{n:'啤酒(一罐)', k:150},
+  {n:'果汁(一杯)', k:120},{n:'花生(一把)', k:300},{n:'辣条(一包)', k:200},
+  {n:'面包(一个)', k:260},{n:'方便面(一碗)', k:470},{n:'坚果(一小把)', k:180},
+];
+const DIST_RANGES = [
+  {v:'all', label:'距离不限', min:0, max:Infinity},
+  {v:'500', label:'500m 内', min:0, max:500},
+  {v:'1000', label:'1km 内', min:0, max:1000},
+  {v:'1-3k', label:'1~3km', min:1000, max:3000},
+  {v:'3-5k', label:'3~5km', min:3000, max:5000},
+];
+
+/* ================= 工具 ================= */
+const $ = id => document.getElementById(id);
+function haversine(a,b){
+  const R=6371000, toR=d=>d*Math.PI/180;
+  const dLat=toR(b.lat-a.lat), dLng=toR(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
+  return Math.round(2*R*Math.asin(Math.sqrt(s)));
+}
+function fmtTime(s){ s=Math.floor(s); const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+function metByMode(mode,kmh){
+  if(mode==='walk'){ if(kmh<3.2)return 2.0; if(kmh<4.8)return 2.8; if(kmh<6.4)return 3.5; return 4.5; }
+  if(mode==='run'){ if(kmh<8)return 7.0; if(kmh<10)return 8.5; if(kmh<12)return 10.0; return 12.0; }
+  if(kmh<16)return 4.0; if(kmh<19)return 6.8; return 8.0;
+}
+function burn(kg, met, hours){ return Math.round(met*kg*hours); }
+function successRate(burnCal,intake){
+  const surplus = burnCal - intake;
+  if(surplus<0){ const r=Math.max(5, Math.round(30 + surplus/intake*100)); return {rate:r, level:'over', label:'透支，记借款', color:'#c03a2b'}; }
+  const ratio = surplus/intake;
+  if(ratio<0.15) return {rate:40, level:'tight', label:'刚好卡线，吃完可能超支', color:'#ff7a45'};
+  if(ratio<0.30) return {rate:75, level:'ok', label:'有余量，基本放心', color:'#2e8b74'};
+  return {rate:95, level:'great', label:'余量足，放心吃', color:'#5fd4b2'};
+}
+
+/* ================= 步骤切换 ================= */
+function setSteps(cur){
+  document.querySelectorAll('.step').forEach(el=>{
+    const n=+el.dataset.step;
+    el.classList.toggle('active', n===cur);
+    el.classList.toggle('done', n<cur);
+  });
+  for(let i=0;i<6;i++){ $('step'+i).classList.toggle('hidden', i!==cur); }
+}
+function goStep(n){
+  setSteps(n);
+  if(n===1) renderPlan();
+  if(n===2){
+    if(!state.upgradeFrom){
+      const pl=state.plan||buildPlan();
+      const lunch=pl.meals[1];
+      state.upgradeFrom={meal:'本餐', kcal:lunch.kcal};
+      $('mapTitle').textContent='选一顿想吃的：用运动挣额度，走得越远吃越好';
+    }
+    renderShops(); ensureMap(); addMarkers();
+  }
+  if(n===3) updateBudgetLine();
+  if(n===4) renderMenu();
+  if(n===5) renderRank();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= 计划生成 ================= */
+function buildPlan(){
+  const p=state.profile;
+  const bmr = Math.round(10*p.weight + 6.25*p.height - 5*p.age + 5); // Mifflin-St Jeor(男)
+  const eatFactor = {正常吃:1.0, 少量控制:0.85, 严格控制:0.7}[p.eat];
+  const months = Math.max(1, Math.min(36, Math.round(p.durationMonths||6)));
+  const days = months*30;
+  const toLose = Math.max(0, p.weight - p.goal);
+  const rawDeficit = toLose>0 ? Math.round(toLose*7700/days) : 0;
+  const deficit = toLose>0 ? Math.min(1000, Math.max(300, rawDeficit)) : 0;
+  const weekly = Math.round(deficit*7/7700*10)/10;   // 每周约减 kg
+  const aggressive = rawDeficit > 1000;
+  const budget = Math.max(1200, Math.round((bmr*1.3 - deficit)*eatFactor));
+  const r = RECIPE_DB[p.taste];
+  const base = {breakfast:Math.round(budget*0.3), lunch:Math.round(budget*0.4), dinner:Math.round(budget*0.3)};
+  if(state.balance.loan>0){
+    const cut = Math.min(Math.round(state.balance.loan*0.1), 150);
+    base.lunch = Math.max(200, base.lunch - cut);
+    base.dinner = Math.max(200, base.dinner - cut);
+  }
+  const sports = (p.sports && p.sports.length) ? p.sports : ['快走/走路'];
+  const will = WILL_FACTOR[p.exercise] || 1;
+  let taskSteps = 0;
+  const exercise = [];
+  sports.forEach(sp=>{
+    const t = EXERCISE_PREF_DB[sp];
+    if(!t) return;
+    t.forEach(([n, met, min, steps])=>{
+      const dur = Math.round(min * will);
+      const kcal = Math.round(met * p.weight * dur/60);
+      const s = Math.round((steps||0) * will);
+      taskSteps += s;
+      exercise.push({n: n + ' ' + dur + ' 分钟', k: kcal, steps: s});
+    });
+  });
+  return { bmr, deficit, budget, months, weekly, aggressive, taskSteps, meals:[
+    {tag:'早', name:r.b, kcal:base.breakfast, cls:'b'},
+    {tag:'午', name:r.l, kcal:base.lunch, cls:'l'},
+    {tag:'晚', name:r.d, kcal:base.dinner, cls:'d'},
+  ], exercise };
+}
+function buildRecommendations(pl){
+  const map={早:null,午:null,晚:null};
+  if(!state.restaurants.length) return map;
+  const all=[];
+  state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>all.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist})); });
+  if(!all.length) return map;
+  pl.meals.forEach(m=>{
+    let bi=0;
+    all.forEach((x,i)=>{ if(Math.abs(x.kcal-m.kcal)<Math.abs(all[bi].kcal-m.kcal)) bi=i; });
+    map[m.tag]=all[bi];
+    all.splice(bi,1);
+  });
+  return map;
+}
+function renderPlan(){
+  const pl=state.plan=buildPlan();
+  $('planSub').textContent=`希望 ${pl.months} 个月从 ${state.profile.weight}kg 瘦到 ${state.profile.goal}kg · 口味「${state.profile.taste}」· 运动「${(state.profile.sports||[]).join('、')}」`;
+  $('loanWarn').innerHTML = state.balance.loan>0
+    ? `<div class="loan-warn">⚠ 你有 <b>${state.balance.loan}</b> 千卡借款未还，本次午/晚餐额度已各收紧 ${Math.min(Math.round(state.balance.loan*0.1),150)} 千卡</div>` : '';
+  $('planWarn').innerHTML = pl.aggressive
+    ? `<div class="loan-warn">⚠ ${pl.months} 个月时间太短，所需缺口已超健康上限（1000 千卡/天），已按上限兜底；每周约减 ${pl.weekly} kg，实际会慢于预期</div>`
+    : `<div class="hint" style="margin-bottom:12px">预计 <b>${pl.months} 个月</b> 达标 · 每周约减 <b>${pl.weekly} kg</b>（${pl.weekly>0.9?'⚠ 偏快':pl.weekly>0.5?'✓ 适中':'✓ 温和'}）</div>`;
+  $('budgetBar').innerHTML=`
+    <div class="b"><div class="v">${pl.bmr}</div><div class="l">基础代谢 (千卡)</div></div>
+    <div class="b"><div class="v" style="color:var(--accent)">−${pl.deficit}</div><div class="l">每日缺口 (千卡)</div></div>
+    <div class="b"><div class="v" style="color:var(--green2)">${pl.budget}</div><div class="l">今日可吃预算 (千卡)</div></div>`;
+  const recs=buildRecommendations(pl);
+  state.recommended=Object.values(recs).filter(Boolean);
+  const mc=$('mealCards'); mc.innerHTML='';
+  const mealNames={早:'早餐',午:'午餐',晚:'晚餐'};
+  pl.meals.forEach(m=>{
+    const rec=recs[m.tag];
+    const name=rec?rec.dish:m.name;
+    const kcal=rec?rec.kcal:m.kcal;
+    const distTxt=rec?(rec.dist>=1000?(rec.dist/1000).toFixed(1)+'km':rec.dist+'m'):'';
+    const sub=rec?`附近 ${distTxt} · ${rec.shop}`:'地图数据加载中，稍后自动推荐附近低卡美食…';
+    const d=document.createElement('div');
+    d.className='meal';
+    d.innerHTML=`<div class="icon ${m.cls}">${m.tag}</div>
+      <div class="info"><div class="m-name">${name}${rec?' <span class="tag green">附近低卡</span>':''}</div>
+      <div class="m-sub">${sub}</div></div>
+      <div class="kcal">${kcal}<small style="font-size:11px;color:var(--gray);font-weight:400"> 千卡</small></div>`;
+    const b=document.createElement('div');
+    b.innerHTML=`<button class="upgrade-btn">我要升级 →</button>`;
+    b.onclick=()=>{
+      state.upgradeFrom={meal:mealNames[m.tag], kcal:m.kcal};
+      $('mapTitle').textContent=`${mealNames[m.tag]}升级：去「${rec?rec.shop:''}」吃 ${rec?rec.dish:''}`;
+      $('mapSub').textContent=`走到店的消耗是额外的「余量」加成，不占这顿饭额度`;
+      goStep(2);
+    };
+    d.appendChild(b);
+    mc.appendChild(d);
+  });
+  const el=$('exerciseList'); el.innerHTML='';
+  const exCal=pl.exercise.reduce((s,x)=>s+x.k,0);
+  pl.exercise.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='task';
+    d.innerHTML=`<div class="t-name">${t.n}${t.steps?'（约 '+t.steps+' 步）':''}</div><div class="t-kcal">约 −${t.k} 千卡</div>`;
+    el.appendChild(d);
+  });
+}
+function maybeRefreshPlan(){
+  if(!$('step1').classList.contains('hidden')) renderPlan();
+}
+
+/* ================= 赚余量 ================= */
+function updateEarnedShow(){
+  $('earnedShow').innerHTML='今日已赚余量：<b style="color:var(--green2)">+'+state.earnedSurplus+'</b> 千卡';
+  $('earnedDetail').textContent = state.earnedLog.length ? ('（'+state.earnedLog.map(x=>x.detail).join('、')+'）') : '';
+}
+function addEarned(){
+  const w=state.profile.weight;
+  const taskSteps=(state.plan&&state.plan.taskSteps)||0;
+  let total=0;
+  const steps=+$('eSteps').value||0;
+  if(steps>0){
+    const net=Math.max(0, steps-taskSteps);
+    if(net>0){
+      const c=Math.round(net*0.045*(w/70));
+      total+=c; state.earnedLog.push({detail:'微信'+steps+'步（已扣任务'+taskSteps+'步）', kcal:c});
+    } else {
+      toast('步数未超过今日任务（'+taskSteps+'步），不计额外余量');
+    }
+  }
+  const sport=$('eSport').value;
+  const min=+$('eMin').value||0;
+  if(sport && min>0){
+    const met=+$('eSport').selectedOptions[0].dataset.met;
+    const c=Math.round(met*w*min/60);
+    total+=c; state.earnedLog.push({detail:sport+min+'分钟', kcal:c});
+  }
+  if(total===0){ if(!steps) toast('先填步数，或选运动+时长'); return; }
+  state.earnedSurplus+=total;
+  updateEarnedShow();
+  toast('这次赚到 +'+total+' 千卡余量！');
+  $('eSteps').value=''; $('eMin').value='';
+}
+function parseFreeEarned(){
+  const text=$('eOther').value.trim();
+  if(!text){ toast('填点东西，如「游泳30分钟」'); return; }
+  const w=state.profile.weight;
+  let met=null;
+  for(const [name,m] of ACTIVITIES){ if(text.includes(name)){ met=m; break; } }
+  if(!met){ toast('没看懂「'+text+'」，试试"游泳30分钟 / 打篮球1小时"'); return; }
+  let kcal=0;
+  const dur=text.match(/(\d+(?:\.\d+)?)\s*(小时|小时|分钟|分|min|h)/i);
+  const cnt=text.match(/(\d+)\s*(个|次|下|组)/);
+  if(dur){
+    let h=+dur[1]; const u=dur[2];
+    if(u==='分钟'||u==='分'||u==='min') h/=60;
+    kcal=Math.round(met*w*h);
+  } else if(cnt){
+    const c=+cnt[1];
+    kcal=Math.round(met>=10 ? c*0.12 : c*0.4); // 跳绳约0.12kcal/个，其余粗估
+  } else {
+    toast('没写时长或数量，试试"游泳30分钟"'); return;
+  }
+  if(kcal<=0){ toast('估算为 0，检查一下输入'); return; }
+  state.earnedSurplus+=kcal;
+  state.earnedLog.push({detail:text, kcal});
+  updateEarnedShow();
+  toast('AI 估算：'+text+' ≈ '+kcal+' 千卡');
+  $('eOther').value='';
+}
+
+/* ================= 定位 ================= */
+function onLocated(lng, lat, src){
+  state.location={lng, lat}; state.locating=false;
+  if(state.map) state.map.setCenter([lng, lat]);
+  $('mapnote').textContent='已定位（'+src+'）· 搜索附近美食…';
+  reverseGeo(state.location);
+  if(state.hasAmap) searchNearby(); else { state.restaurants=mockShopsAround(state.location); renderShops(); renderMockMap(); }
+}
+function locate(){
+  if(state.locating) return;
+  state.locating=true;
+  const useDefault=()=>{ state.location=DEFAULT_CENTER; state.locating=false; $('mapnote').textContent='定位失败，使用默认位置（北京）'; if(state.hasAmap) searchNearby(); else { state.restaurants=mockShopsAround(state.location); renderShops(); } };
+  const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+  if(Geo){
+    const go=()=>Geo.getCurrentPosition({enableHighAccuracy:true, timeout:15000, maximumAge:60000})
+      .then(res=>{
+        if(res && res.coords){ onLocated(res.coords.longitude, res.coords.latitude, '原生GPS'); }
+        else { state.locating=false; useDefault(); }
+      })
+      .catch(err=>{ state.locating=false; $('mapnote').textContent='GPS 失败('+(err&&err.message||err)+')，试高德IP'; amapGeoFallback(useDefault); });
+    if(Geo.requestPermissions){
+      Geo.requestPermissions().then(perm=>{
+        if(perm && (perm.location==='granted' || perm.coarseLocation==='granted')){ go(); }
+        else { state.locating=false; $('mapnote').textContent='定位权限被拒绝，请到系统设置允许定位'; useDefault(); }
+      }).catch(()=>go());
+    } else { go(); }
+  } else if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ onLocated(pos.coords.longitude, pos.coords.latitude, '浏览器'); },
+      ()=>{ amapGeoFallback(useDefault); },
+      {enableHighAccuracy:true, timeout:8000, maximumAge:60000}
+    );
+  } else { amapGeoFallback(useDefault); }
+}
+function amapGeoFallback(useDefault){
+  if(!state.amap) return useDefault();
+  const geo=new state.amap.Geolocation({enableHighAccuracy:true, timeout:8000});
+  geo.getCurrentPosition((status,res)=>{
+    if(status==='complete' && res.position){
+      state.location={lng:res.position.lng, lat:res.position.lat}; state.locating=false;
+      $('mapnote').textContent='已定位（高德）· 搜索附近美食…';
+      searchNearby();
+    } else { state.locating=false; useDefault(); }
+  });
+}
+function mockShopsAround(c){
+  const ds=[400,800,500,1500,2000,3000];
+  return SAMPLE_SHOPS.map((s,i)=>{
+    const d=ds[i%ds.length], ang=i*Math.PI/3;
+    const dLat=d/111320*Math.cos(ang);
+    const dLng=d/(111320*Math.cos(c.lat*Math.PI/180))*Math.sin(ang);
+    return {...s, lng:c.lng+dLng, lat:c.lat+dLat, dist:d, walk:true};
+  }).sort((a,b)=>a.kcal-b.kcal);
+}
+function reverseGeo(pos){
+  if(!state.amap) return;
+  state.amap.plugin('AMap.Geocoder',()=>{
+    new state.amap.Geocoder().getAddress([pos.lng,pos.lat],(status,res)=>{
+      if(status==='complete' && res.regeocode){
+        $('locInfo').textContent='当前定位：'+res.regeocode.formattedAddress;
+      }
+    });
+  });
+}
+function setMyLocation(pos){
+  state.location=pos;
+  $('mapnote').textContent='已设置位置 · 搜索附近美食…';
+  if(state.map) state.map.setCenter([pos.lng,pos.lat]);
+  reverseGeo(pos);
+  if(state.hasAmap) searchNearby();
+  else { state.restaurants=mockShopsAround(pos); renderShops(); renderMockMap(); }
+}
+function searchLocation(){
+  if(!state.hasAmap){ alert('需先连接高德才能搜索位置'); return; }
+  const kw=$('locSearch').value.trim();
+  if(!kw){ return; }
+  const AMap=state.amap;
+  AMap.plugin('AMap.PlaceSearch',()=>{
+    const ps=new AMap.PlaceSearch({pageSize:5});
+    ps.search(kw,(status,result)=>{
+      if(status==='complete' && result.poiList && result.poiList.pois.length){
+        const p=result.poiList.pois[0];
+        setMyLocation({lng:p.location.lng, lat:p.location.lat});
+      } else {
+        const err=(result&&result.info)?('['+result.info+'] '):'';
+        $('locInfo').textContent=err+'没搜到「'+kw+'」，换个更具体的地址/城市试试';
+      }
+    });
+  });
+}
+function relocate(){
+  $('mapnote').textContent='定位中…';
+  state.locating=false;
+  locate();
+}
+
+/* ================= 高德地图 ================= */
+function loadAMap(key, sec){
+  return new Promise((res,rej)=>{
+    if(window.AMap) return res(window.AMap);
+    if(sec){ window._AMapSecurityConfig = { securityJsCode: sec }; }
+    const s=document.createElement('script');
+    s.src=`https://webapi.amap.com/maps?v=2.0&key=${key}&plugin=AMap.Walking,AMap.PlaceSearch,AMap.Geolocation`;
+    s.onload=()=>res(window.AMap); s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+function ensureMap(){
+  if(state.map) return state.map;
+  if(!state.amap) return null;
+  const c=state.location||DEFAULT_CENTER;
+  state.map=new state.amap.Map('map',{zoom:15,center:[c.lng,c.lat]});
+  state.map.on('click',e=>{ setMyLocation({lng:e.lnglat.lng, lat:e.lnglat.lat}); });
+  return state.map;
+}
+function addMarkers(){
+  if(!state.map) return;
+  state.map.clearMap();
+  const c=state.location||DEFAULT_CENTER;
+  new state.amap.Marker({position:[c.lng,c.lat], map:state.map, title:'我'});
+  filteredShops().forEach(sh=>{ new state.amap.Marker({position:[sh.lng,sh.lat], map:state.map, title:sh.name}); });
+}
+async function connectAMap(){
+  const key=$('amapKey').value.trim();
+  const sec=$('amapSec').value.trim();
+  if(!key){ alert('请先粘贴高德 JS API Key'); return; }
+  try{
+    const AMap=await loadAMap(key, sec);
+    state.amapKey=key; state.hasAmap=true; state.amap=AMap;
+    localStorage.setItem('amapKey',key);
+    if(sec) localStorage.setItem('amapSec',sec);
+    $('mapmode').textContent='高德在线'; $('mapmode').classList.add('on');
+    $('map').classList.remove('hidden'); $('mockmap').classList.add('hidden');
+    ensureMap();
+    if(!state.location) locate();
+    else searchNearby();
+  }catch(e){ alert('高德加载失败：'+e.message+'，继续用演示模式'); }
+}
+function mapPois(pois, c){
+  const AMap=state.amap;
+  return pois.map((p)=>{
+    const loc=p.location;
+    const d=Math.round(AMap.GeometryUtil.distance([c.lng,c.lat],[loc.lng,loc.lat]));
+    const cat=matchMenu(p.name, p.type);
+    const menu=MENU_DB[cat].menu;
+    const low=Math.min(...menu.map(x=>x.k));
+    const lowDish=menu.find(x=>x.k===low);
+    return {name:p.name, cat, dish:'最低卡 · '+lowDish.n, kcal:low, lng:loc.lng, lat:loc.lat, dist:d, walk:false, menu};
+  }).sort((a,b)=>a.kcal-b.kcal);
+}
+function searchNearby(){
+  if(!state.amap) return;
+  const AMap=state.amap;
+  const c=state.location||DEFAULT_CENTER;
+  $('mapnote').textContent='搜索附近美食…';
+  AMap.plugin('AMap.PlaceSearch',()=>{
+    const ps=new AMap.PlaceSearch({pageSize:20});
+    ps.searchNearBy('美食',[c.lng,c.lat],3000,(status,result)=>{
+      if(status==='complete' && result.poiList && result.poiList.pois.length>0){
+        state.restaurants=mapPois(result.poiList.pois, c);
+      } else {
+        state.restaurants=mockShopsAround(c);
+        const err=(result&&result.info)?('['+result.info+'] '):'';
+        $('mapnote').textContent=err+'附近暂无美食POI，用就近演示店';
+      }
+      renderShops(); ensureMap(); addMarkers();
+      enrichDistances();
+    });
+  });
+}
+function searchFood(){
+  const kw=$('foodSearch').value.trim();
+  if(!kw){ return; }
+  const c=state.location||DEFAULT_CENTER;
+  if(!state.hasAmap){
+    const matched=state.restaurants.filter(sh=> sh.name.includes(kw) || sh.dish.includes(kw) || (sh.menu&&sh.menu.some(m=>m.n.includes(kw))));
+    if(matched.length){ state.restaurants=matched; $('mapnote').textContent='演示模式：含「'+kw+'」的店 '+matched.length+' 家'; }
+    else { $('mapnote').textContent='演示模式没有「'+kw+'」相关的店'; }
+    renderShops(); renderMockMap();
+    return;
+  }
+  const AMap=state.amap;
+  $('mapnote').textContent='搜索「'+kw+'」…';
+  AMap.plugin('AMap.PlaceSearch',()=>{
+    const ps=new AMap.PlaceSearch({pageSize:20});
+    ps.searchNearBy(kw,[c.lng,c.lat],3000,(status,result)=>{
+      if(status==='complete' && result.poiList && result.poiList.pois.length>0){
+        state.restaurants=mapPois(result.poiList.pois, c);
+        $('mapnote').textContent='搜到 '+state.restaurants.length+' 家「'+kw+'」附近店（按最低卡排序）';
+      } else {
+        const err=(result&&result.info)?('['+result.info+'] '):'';
+        $('mapnote').textContent=err+'没搜到「'+kw+'」，换个词（如 烤肉/面/沙拉）试试';
+      }
+      renderShops(); ensureMap(); addMarkers();
+      enrichDistances();
+    });
+  });
+}
+function routeToShop(){
+  if(!state.hasAmap || !state.selected) return;
+  const AMap=state.amap; ensureMap();
+  AMap.plugin('AMap.Walking',()=>{
+    const w=new AMap.Walking({map:state.map,panel:null});
+    const c=state.location||DEFAULT_CENTER;
+    w.search([c.lng,c.lat],[state.selected.lng,state.selected.lat],(status,result)=>{
+      if(status==='complete' && result.routes && result.routes.length){
+        state.distance=result.routes[0].distance;
+        $('destDist').textContent=state.distance;
+      }
+    });
+  });
+}
+function enrichDistances(){
+  if(!state.hasAmap || !state.amap || !state.restaurants.length) return;
+  const AMap=state.amap;
+  AMap.plugin('AMap.Walking',()=>{
+    const c=state.location||DEFAULT_CENTER;
+    const list=state.restaurants;
+    let pending=list.length;
+    $('mapnote').textContent='计算真实步行距离中…';
+    list.forEach(sh=>{
+      const w=new AMap.Walking();
+      w.search([c.lng,c.lat],[sh.lng,sh.lat],(status,result)=>{
+        if(status==='complete' && result.routes && result.routes.length){
+          sh.dist=result.routes[0].distance; sh.walk=true;
+        }
+        if(--pending<=0){
+          $('mapnote').textContent='已按真实步行距离显示';
+          renderShops(); ensureMap(); addMarkers();
+        }
+      });
+    });
+  });
+}
+
+/* ================= 演示模式地图 ================= */
+function renderMockMap(){
+  const svg=$('mockmap');
+  const c=state.location||DEFAULT_CENTER;
+  const pts=[c, ...filteredShops()];
+  const lngs=pts.map(p=>p.lng), lats=pts.map(p=>p.lat);
+  const minLng=Math.min(...lngs), maxLng=Math.max(...lngs);
+  const minLat=Math.min(...lats), maxLat=Math.max(...lats);
+  const W=svg.clientWidth||700, H=svg.clientHeight||340, pad=40;
+  const sx=l=>pad+(l-minLng)/(maxLng-minLng||1)*(W-2*pad);
+  const sy=l=>H-pad-(l-minLat)/(maxLat-minLat||1)*(H-2*pad);
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  for(let i=0;i<6;i++){ s+=`<line x1="0" y1="${i*H/5}" x2="${W}" y2="${i*H/5}" stroke="#c2d5cc" stroke-width="1"/>`; }
+  for(let i=0;i<8;i++){ s+=`<line x1="${i*W/7}" y1="0" x2="${i*W/7}" y2="${H}" stroke="#c2d5cc" stroke-width="1"/>`; }
+  s+=`<circle cx="${sx(c.lng)}" cy="${sy(c.lat)}" r="7" fill="#ff7a45" stroke="#fff" stroke-width="2"/>`;
+  s+=`<text x="${sx(c.lng)}" y="${sy(c.lat)-10}" fill="#0f2e2a" font-size="11" font-weight="700" text-anchor="middle">我</text>`;
+  filteredShops().forEach(sh=>{ s+=`<circle cx="${sx(sh.lng)}" cy="${sy(sh.lat)}" r="6" fill="#1f6e5c" stroke="#fff" stroke-width="2"/>`; });
+  s+=`</svg>`;
+  svg.innerHTML=s;
+}
+
+/* ================= 店铺列表 ================= */
+function filteredShops(){
+  if(!state.distFilter || state.distFilter==='all') return state.restaurants;
+  const r=DIST_RANGES.find(x=>x.v===state.distFilter);
+  return state.restaurants.filter(sh=> sh.dist>=r.min && sh.dist<=r.max);
+}
+function renderShops(){
+  const c=state.location||DEFAULT_CENTER;
+  if(state.hasAmap){
+    if(state.restaurants.length===0) searchNearby();
+  } else {
+    if(!state.restaurants.length) state.restaurants=mockShopsAround(c);
+    renderMockMap();
+  }
+  const recShops=new Set(state.recommended.map(r=>r.shop));
+  const shops=filteredShops();
+  const list=$('shopList'); list.innerHTML='';
+  if(shops.length===0){
+    list.innerHTML='<div class="hint" style="text-align:center;padding:16px">当前偏好距离内没有店，放宽距离或换个词试试</div>';
+  }
+  shops.forEach((sh,i)=>{
+    const wrap=document.createElement('div');
+    const d=document.createElement('div');
+    d.className='shop';
+    d.innerHTML=`<div class="rank ${i<3?'top':''}">${i+1}</div>
+      <div class="info"><div class="name">${sh.name}${recShops.has(sh.name)?' <span class="tag orange">荐</span>':''}</div><div class="dish">${sh.dish||sh.menu[0].n}</div></div>
+      <div class="kcal">${sh.kcal}<small> 千卡起</small></div>
+      <div class="dist">步行 ${sh.dist>=1000?(sh.dist/1000).toFixed(1)+'km':sh.dist+'m'}</div>`;
+    const menu=document.createElement('div');
+    menu.className='shop-menu';
+    menu.innerHTML=`<div class="sm-title">一般菜品（模拟估卡 · 最低卡在前）</div>`+
+      sh.menu.slice().sort((a,b)=>a.k-b.k).map(x=>`<div class="sm-row"><span>${x.n}</span><b>${x.k} 千卡</b></div>`).join('')+
+      `<button class="btn btn-primary btn-block" style="margin-top:8px">去这家，选菜 →</button>`;
+    d.onclick=()=>{ state.selected=sh; state.distance=sh.dist; selectShop(d); menu.classList.toggle('open'); };
+    menu.querySelector('button').onclick=(e)=>{ e.stopPropagation(); state.selected=sh; state.distance=sh.dist; selectShop(d); goStep(3); };
+    wrap.appendChild(d); wrap.appendChild(menu);
+    list.appendChild(wrap);
+  });
+  maybeRefreshPlan();
+}
+function selectShop(el){
+  document.querySelectorAll('.shop').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+  $('destName').textContent=state.selected.name;
+  $('destDist').textContent=state.distance;
+  $('toStep3').disabled=false;
+  if(state.hasAmap) routeToShop();
+}
+
+/* ================= 出发 / 计时 ================= */
+function updateBudgetLine(){
+  const b=budgetInfo();
+  $('baseBudget').textContent=b.base;
+  $('liveBurn').textContent=b.burnCal;
+  $('liveEarned').textContent=b.earned;
+  $('liveBudget').textContent=b.budget;
+}
+function startTrip(){
+  state.trip.mode=$('travelMode').value;
+  state.trip.start=Date.now();
+  $('startBtn').disabled=true;
+  $('arriveBtn').classList.remove('hidden');
+  $('sDist').textContent=state.distance;
+  state.timerId=setInterval(tick,500);
+}
+function tick(){
+  state.trip.elapsed=(Date.now()-state.trip.start)/1000;
+  const kmh=state.distance/1000/(state.trip.elapsed/3600);
+  state.trip.speed=kmh; state.trip.met=metByMode(state.trip.mode,kmh);
+  state.trip.burn=burn(state.profile.weight,state.trip.met,state.trip.elapsed/3600);
+  $('timer').textContent=fmtTime(state.trip.elapsed);
+  $('sSpeed').textContent=kmh.toFixed(1);
+  $('sCal').textContent=state.trip.burn;
+  updateBudgetLine();
+}
+function arrive(){ clearInterval(state.timerId); tick(); goStep(4); }
+function simArrive(){
+  clearInterval(state.timerId);
+  const speedKmh = state.trip.mode==='walk'?5 : state.trip.mode==='run'?10 : 15;
+  state.trip.elapsed = state.distance/1000/speedKmh*3600;
+  state.trip.speed=speedKmh; state.trip.met=metByMode(state.trip.mode,speedKmh);
+  state.trip.burn=burn(state.profile.weight,state.trip.met,state.trip.elapsed/3600);
+  $('timer').textContent=fmtTime(state.trip.elapsed);
+  $('sSpeed').textContent=speedKmh.toFixed(1);
+  $('sCal').textContent=state.trip.burn;
+  $('sDist').textContent=state.distance;
+  updateBudgetLine();
+  goStep(4);
+}
+
+/* ================= 点菜 ================= */
+function budgetInfo(){
+  const base=(state.upgradeFrom?state.upgradeFrom.kcal:0);
+  const burnCal=state.trip.burn||0;
+  const earned=state.earnedSurplus||0;
+  return {base, burnCal, earned, budget:base+burnCal+earned};
+}
+function renderMenu(){
+  const sh=state.selected;
+  $('orderTitle').textContent=sh.name+' · 点菜（拍照估卡）';
+  const m=$('menuList'); m.innerHTML='';
+  sh.menu.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='menu-item';
+    d.innerHTML=`<div class="ck">✓</div><div class="nm">${item.n}</div><div class="kcal">${item.k} 千卡</div>`;
+    d.onclick=()=>{ const i=state.order.items.findIndex(x=>x.n===item.n); if(i>=0) state.order.items.splice(i,1); else state.order.items.push(item); d.classList.toggle('sel'); state.photoNote=''; updateIntake(); };
+    m.appendChild(d);
+  });
+  const b=budgetInfo();
+  $('burnBox').innerHTML=`<div class="lbl">${state.upgradeFrom?state.upgradeFrom.meal+'额度升级':'额度'}</div>
+    <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:8px 0">
+      <span style="color:#bfd6d1;font-size:14px">原额度 <b style="color:#fff;font-size:20px">${b.base}</b></span>
+      <span style="color:#5fd4b2;font-size:15px">＋ 走到店 <b style="font-size:20px">${b.burnCal}</b></span>
+      <span style="color:#5fd4b2;font-size:15px">＋ 今日运动 <b style="font-size:20px">${b.earned}</b></span>
+      <span style="color:#bfd6d1;font-size:16px">＝ 可吃 <b style="color:var(--accent);font-size:24px">${b.budget}</b></span>
+    </div>
+    <div style="font-size:12px;color:#bfd6d1">${state.distance} 米 · 用时 ${fmtTime(state.trip.elapsed)} · 配速 ${state.trip.speed.toFixed(1)} km/h · MET ${state.trip.met}</div>`;
+  renderExtraList();
+  updateIntake();
+}
+function renderExtraList(){
+  const el=$('extraList'); el.innerHTML='';
+  state.order.extras.forEach((x,i)=>{
+    const d=document.createElement('div');
+    d.className='extra-row';
+    d.innerHTML=`<span class="er-n">${x.n}</span><span class="er-k">${x.k} 千卡</span><span class="er-x" onclick="removeExtra(${i})">×</span>`;
+    el.appendChild(d);
+  });
+}
+function removeExtra(i){ state.order.extras.splice(i,1); renderExtraList(); updateIntake(); }
+function addExtraFromSelect(){
+  const s=$('extraSelect');
+  if(!s.value){ return; }
+  const k=+s.selectedOptions[0].dataset.k;
+  state.order.extras.push({n:s.value, k});
+  renderExtraList(); updateIntake();
+}
+function addExtraManual(){
+  const name=$('extraName').value.trim();
+  const k=+$('extraKcal').value||0;
+  if(k<=0){ toast('填个热量（千卡）'); return; }
+  state.order.extras.push({n:name||'自定义', k});
+  $('extraName').value=''; $('extraKcal').value='';
+  renderExtraList(); updateIntake();
+}
+function aiEndpoint(){
+  if(state.aiBase) return state.aiBase.replace(/\/+$/,'');
+  const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  if(!isNative && (location.protocol==='http:'||location.protocol==='https:')) return location.origin+'/api/food-recognize';
+  return '';
+}
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(file); });
+}
+async function recognizeFood(file){
+  const url=aiEndpoint();
+  if(!url) return null;
+  try{
+    const dataUrl=await fileToDataURL(file);
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})});
+    if(!r.ok) return null;
+    const o=await r.json();
+    if(o && o.name && o.kcal>0) return {n:o.name, k:o.kcal};
+    return null;
+  }catch(e){ return null; }
+}
+function openExtraCamera(){ $('extraPhotoInput').click(); }
+async function handleExtraPhoto(file){
+  const url=URL.createObjectURL(file);
+  const pr=$('extraPhotoResult');
+  pr.classList.remove('hidden');
+  pr.innerHTML=`<div class="photo-box"><img src="${url}"><div class="ai-analyzing">🔍 AI 识别中…</div></div>`;
+  let item=await recognizeFood(file);
+  const real=!!item;
+  if(!item){
+    const pick=EXTRA_DB[Math.floor(Math.random()*EXTRA_DB.length)];
+    item={n:pick.n, k:Math.round(pick.k*(1+Math.random()*0.3-0.15))};
+  }
+  if(!state.order.extras.find(x=>x.n===item.n)) state.order.extras.push({n:item.n,k:item.k});
+  pr.innerHTML=`<div class="photo-box"><img src="${url}"><div><div style="font-weight:700;color:var(--dark)">${item.n}</div><div style="color:var(--accent);font-weight:700">≈ ${item.k} 千卡</div><div style="font-size:11px;color:var(--gray)">${real?'GLM-4V 实拍识别':'模拟识别（未连 AI 服务）'}</div></div></div>`;
+  renderExtraList(); updateIntake();
+}
+function updateIntake(){
+  const dishCal=state.order.items.reduce((s,x)=>s+x.k,0);
+  const extraCal=state.order.extras.reduce((s,x)=>s+x.k,0);
+  state.order.intake=dishCal+extraCal;
+  $('settleBtn').disabled=(state.order.items.length===0 && state.order.extras.length===0);
+  const b=budgetInfo();
+  const remain=b.budget-state.order.intake;
+  const rb=$('resultBox');
+  if(state.order.items.length===0 && state.order.extras.length===0){ rb.classList.add('hidden'); return; }
+  rb.classList.remove('hidden');
+  const over=remain<0;
+  const color=over?'#ff9a86':'#5fd4b2';
+  rb.innerHTML=`<div class="result-box" style="margin-top:14px">
+    ${state.photoNote?`<div class="lbl">${state.photoNote}</div>`:''}
+    <div class="lbl">已摄入 <b style="color:#fff;font-size:20px">${state.order.intake}</b> 千卡 / 可吃 ${b.budget} 千卡</div>
+    ${extraCal>0?`<div class="lbl" style="color:var(--accent)">其中饮料零食 <b>${extraCal}</b> 千卡</div>`:''}
+    <div class="big-num" style="color:${color}">${over?'超出':'剩余'} ${Math.abs(remain)} 千卡</div>
+    <div style="font-size:13px;color:#bfd6d1">${over?'→ 记借款':'→ 存起来'}</div></div>`;
+}
+function openCamera(){ $('photoInput').click(); }
+async function handlePhoto(file){
+  const url=URL.createObjectURL(file);
+  const pr=$('photoResult');
+  pr.classList.remove('hidden');
+  pr.innerHTML=`<div class="photo-box"><img src="${url}"><div class="ai-analyzing">🔍 AI 识别中…</div></div>`;
+  let item=await recognizeFood(file);
+  const real=!!item;
+  if(!item){
+    const pool=state.selected.menu.concat(EXTRA_DB.map(x=>({n:x.n,k:x.k})));
+    const pick=pool[Math.floor(Math.random()*pool.length)];
+    item={n:pick.n, k:Math.round(pick.k*(1+Math.random()*0.3-0.15))};
+  }
+  state.photoNote='📷 AI 识别：'+item.n+' ≈ '+item.k+' 千卡';
+  if(!state.order.items.find(x=>x.n===item.n)) state.order.items.push({n:item.n,k:item.k});
+  pr.innerHTML=`<div class="photo-box"><img src="${url}"><div><div style="font-size:14px;font-weight:700;color:var(--dark)">${item.n}</div><div style="font-size:13px;color:var(--accent);font-weight:700">≈ ${item.k} 千卡</div><div style="font-size:11px;color:var(--gray)">${real?'GLM-4V 实拍识别':'模拟识别（未连 AI 服务）'}</div></div></div>`;
+  updateIntake();
+}
+
+/* ================= 记账 / 余卡 ================= */
+function settle(){
+  const b=budgetInfo();
+  const surplus=b.budget-state.order.intake; // 正=存款 负=借款
+  if(surplus>=0) state.balance.deposit+=surplus; else state.balance.loan+=-surplus;
+  state.balance.history.push({shop:state.selected.name, base:b.base, burn:b.burnCal, budget:b.budget, intake:state.order.intake, surplus});
+  const over=surplus<0;
+  $('balanceBox').innerHTML=`<div class="lbl">本次结果：原额度 ${b.base} ＋ 走到店 ${b.burnCal} ＋ 今日运动 ${b.earned} ＝ 可吃 ${b.budget}，实际吃了 ${state.order.intake}</div>
+    <div class="big-num" style="color:${over?'#ff9a86':'#5fd4b2'}">${over?'−':'+'}${Math.abs(surplus)} 千卡</div>
+    <div style="font-size:12px;color:#bfd6d1">${over?'借款：欠卡了，下次食谱额度会收紧':'存款：余卡存起来了，随时能吃顿好的'}</div>`;
+  goStep(5);
+}
+
+/* ================= 排行榜 ================= */
+function renderRank(){
+  $('totalDeposit').textContent=state.balance.deposit;
+  $('totalLoan').textContent=state.balance.loan;
+  const myMonth = Math.round((state.balance.deposit - state.balance.loan) * 30);
+  const h=state.balance.history;
+  const myRate = h.length ? Math.round(h.filter(x=>x.surplus>=0).length/h.length*100) : null;
+  const last=h[h.length-1];
+  const myStory = last
+    ? `最近一笔：走到「${last.shop}」消耗 ${last.burn} 千卡，${last.surplus>=0?'余卡 +'+last.surplus:'借款 −'+(-last.surplus)}`
+    : '完成第一笔记录后，这里会生成你的炫耀卡';
+  const others=[
+    {nm:'隔壁小王', month:15200, rate:88, story:'本月换了 12 顿爱吃的，顿顿在预算内'},
+    {nm:'坚持老张', month:9800, rate:81, story:'通勤快走攒卡，月底用余卡吃了顿火锅'},
+    {nm:'卷王丽丽', month:6200, rate:76, story:'每天多走 3000 米，余卡越攒越多'},
+    {nm:'努力的大头', month:3400, rate:64, story:'偶尔超支，但整体在攒'},
+    {nm:'路人甲', month:1200, rate:51, story:'刚起步，稳步前进'},
+    {nm:'躺平君', month:-2600, rate:28, story:'借卡太多，额度被收紧'},
+  ];
+  const me={nm:'我（'+state.profile.weight+'kg）', month:myMonth, rate:myRate, story:myStory, me:true};
+  const all=[...others,me].sort((a,b)=>b.month-a.month);
+  const list=$('rankList'); list.innerHTML='';
+  all.forEach((u,i)=>{
+    const row=document.createElement('div');
+    row.className='rank-row'+(u.me?' me':'');
+    row.innerHTML=`<div class="pos ${i===0?'gold':''}">${i+1}</div>
+      <div class="nm">${u.nm}${u.me?'（我）':''}</div>
+      <div class="val">${u.month>=0?'+':''}${u.month}<small style="font-size:11px;color:var(--gray);font-weight:400"> 本月</small></div>`;
+    const det=document.createElement('div');
+    det.className='rank-detail';
+    const rateTxt = u.rate==null ? '—（完成记录后计算）' : u.rate+'%';
+    const rateColor = u.rate==null ? '#6b7774' : (u.rate>=75?'#2e8b74':(u.rate>=50?'#ff7a45':'#c03a2b'));
+    det.innerHTML=`<div class="d-line"><span>本月最终余卡</span><b style="color:var(--primary)">${u.month>=0?'+':''}${u.month} 千卡</b></div>
+      <div class="d-line"><span>成功率（吃到想吃且不超预算）</span><b style="color:${rateColor}">${rateTxt}</b></div>
+      <div class="gauge" style="background:var(--light)"><div class="fill" style="width:${u.rate==null?0:u.rate}%;background:${rateColor}"></div></div>
+      <div class="story">${u.story}</div>`;
+    row.onclick=()=>det.classList.toggle('open');
+    list.appendChild(row);
+    list.appendChild(det);
+  });
+}
+
+/* ================= 分享 ================= */
+function shareResult(){
+  const myMonth = Math.round((state.balance.deposit - state.balance.loan)*30);
+  const last=state.balance.history[state.balance.history.length-1];
+  let txt;
+  if(last){
+    const s = last.surplus>=0 ? ('余卡还剩 '+last.surplus) : ('透支 '+(-last.surplus)+'（记借款）');
+    txt=`我在「卡路里之路」为爱吃的东西付出努力：走到「${last.shop}」消耗了 ${last.burn} 千卡，${s}！本月模拟最终余卡 ${myMonth>=0?'+':''}${myMonth} 千卡 💪`;
+  } else {
+    txt=`我在「卡路里之路」开始减肥啦！本月模拟最终余卡 ${myMonth>=0?'+':''}${myMonth} 千卡，为爱吃的东西付出有意义努力 💪`;
+  }
+  if(navigator.share){
+    navigator.share({title:'卡路里之路', text:txt}).catch(()=>{});
+  } else {
+    copyText(txt);
+  }
+}
+function copyText(t){
+  const ta=document.createElement('textarea');
+  ta.value=t; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('已复制分享文案，去粘贴给朋友吧'); }
+  catch(e){ toast(t); }
+  document.body.removeChild(ta);
+}
+function toast(msg){
+  let el=$('toast');
+  if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+/* ================= 初始化 ================= */
+function resetDemo(){
+  state.balance={deposit:0,loan:0,history:[]};
+  state.earnedSurplus=0; state.earnedLog=[];
+  state.order={items:[],extras:[],intake:0};
+  state.trip={mode:'walk',start:0,elapsed:0,burn:0,speed:0,met:0};
+  state.selected=null; state.distance=0;
+  state.upgradeFrom=null; state.photoNote='';
+  $('startBtn').disabled=false; $('arriveBtn').classList.add('hidden');
+  goStep(0);
+}
+function renderSportChips(){
+  const box=$('pSportChips'); box.innerHTML='';
+  SPORT_OPTIONS.forEach(sp=>{
+    const c=document.createElement('div');
+    c.className='chip'+(state.profile.sports.includes(sp)?' on':'');
+    c.textContent=sp;
+    c.onclick=()=>{
+      const i=state.profile.sports.indexOf(sp);
+      if(i>=0){ state.profile.sports.splice(i,1); c.classList.remove('on'); }
+      else { state.profile.sports.push(sp); c.classList.add('on'); }
+    };
+    box.appendChild(c);
+  });
+}
+function init(){
+  const saved=localStorage.getItem('amapKey');
+  if(saved) $('amapKey').value=saved;
+  const savedSec=localStorage.getItem('amapSec');
+  if(savedSec) $('amapSec').value=savedSec;
+  const savedAi=localStorage.getItem('aiBase');
+  if(savedAi) $('aiBase').value=savedAi;
+  state.aiBase=$('aiBase').value.trim();
+  $('aiBase').onchange=e=>{ state.aiBase=e.target.value.trim(); localStorage.setItem('aiBase', state.aiBase); };
+  $('connectBtn').onclick=connectAMap;
+  $('amapKey').onkeydown=e=>{ if(e.key==='Enter') connectAMap(); };
+  const sync=()=>{ const p=state.profile;
+    p.weight=+$('pWeight').value||100; p.goal=+$('pGoal').value||75; p.durationMonths=+$('pDuration').value||6;
+    p.height=+$('pHeight').value||170; p.age=+$('pAge').value||30;
+    p.taste=$('pTaste').value; p.exercise=$('pExercise').value; p.eat=$('pEat').value;
+  };
+  sync();
+  renderSportChips();
+  ['pWeight','pGoal','pDuration','pHeight','pAge','pTaste','pExercise','pEat'].forEach(id=>{ $(id).onchange=sync; $(id).oninput=sync; });
+  const sel=$('eSport');
+  ACTIVITIES.forEach(([name,met])=>{ const o=document.createElement('option'); o.value=name; o.dataset.met=met; o.textContent=name+'（约 '+met+' MET）'; sel.appendChild(o); });
+  const esel=$('extraSelect');
+  EXTRA_DB.forEach(x=>{ const o=document.createElement('option'); o.value=x.n; o.dataset.k=x.k; o.textContent=x.n+'（'+x.k+' 千卡）'; esel.appendChild(o); });
+  $('photoInput').onchange=e=>{ if(e.target.files&&e.target.files[0]) handlePhoto(e.target.files[0]); };
+  $('extraPhotoInput').onchange=e=>{ if(e.target.files&&e.target.files[0]) handleExtraPhoto(e.target.files[0]); };
+  $('distFilter').onchange=e=>{ state.distFilter=e.target.value; renderShops(); renderMockMap(); addMarkers(); };
+  if($('amapKey').value.trim()) setTimeout(connectAMap, 300);
+}
+init();
+setSteps(0);
+</script>
+</body>
+</html>
