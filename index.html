@@ -16,7 +16,7 @@ body{
   font-family:system-ui,-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;
   background:linear-gradient(160deg,#0f2e2a 0%,#123c33 40%,#1f6e5c 100%);
   color:var(--text); display:flex; justify-content:center; align-items:flex-start;
-  min-height:100vh; padding:24px 12px;
+  min-height:100vh; padding:24px 12px 80px;
 }
 #app{width:100%;max-width:920px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
@@ -146,7 +146,7 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
 .rank-row .pos.gold{color:var(--gold)}
 .rank-row .nm{flex:1;font-weight:600;font-size:14px}
 .rank-row .val{font-weight:800;color:var(--primary)}
-.hidden{display:none}
+.hidden{display:none!important}
 .hint{font-size:12px;color:var(--gray);line-height:1.6}
 .foot{text-align:center;color:#bfd6d1;font-size:11px;margin:20px 0;line-height:1.6}
 .rank-row{cursor:pointer}
@@ -157,8 +157,31 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
 .rank-detail.open{display:block}
 .rank-detail .d-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
 .rank-detail .story{font-size:12px;color:var(--gray);line-height:1.5;margin-top:4px}
+.rank-detail .calc-title{font-size:12px;font-weight:700;color:var(--dark);margin:10px 0 4px;border-top:1px dashed var(--line);padding-top:8px}
+.rank-detail .calc{font-family:ui-monospace,Consolas,Menlo,monospace;font-size:11px;color:var(--gray);line-height:1.75;padding-left:10px;border-left:2px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:var(--dark);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
 .toast.show{opacity:1}
+.tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--white);box-shadow:0 -2px 10px rgba(0,0,0,.12);z-index:100}
+.tabbar .tab{flex:1;padding:13px;text-align:center;border:none;background:none;font-size:14px;font-weight:700;color:var(--gray);cursor:pointer;border-top:3px solid transparent}
+.tabbar .tab.active{color:var(--primary);border-top-color:var(--accent)}
+.date-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.date-pill{background:var(--primary);color:#fff;font-size:14px;font-weight:700;padding:8px 14px;border-radius:20px}
+.meal-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px}
+.meal-tag.done{background:#e3f2ec;color:var(--primary)}
+.meal-tag.recipe{background:var(--light);color:var(--gray)}
+.mock-note2{font-size:11px;color:var(--gray);margin:6px 0;padding:6px 10px;background:var(--light);border-radius:8px}
+.auth-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#0f2e2a,#1f6e5c);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.auth-box{background:#fff;border-radius:18px;padding:26px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.auth-box .alogo{width:54px;height:54px;border-radius:14px;background:var(--accent);color:#fff;font-size:26px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.auth-box h2{font-size:20px;color:var(--dark)}
+.auth-box .asub{font-size:12px;color:var(--gray);margin:4px 0 6px}
+.auth-box input{width:100%;padding:12px;margin-top:10px;border:1px solid var(--line);border-radius:10px;font-size:15px;outline:none;box-sizing:border-box}
+.auth-box button{width:100%;margin-top:10px;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:var(--primary);color:#fff}
+.auth-box button.ghost{background:var(--light);color:var(--primary)}
+.auth-box .amsg{font-size:12px;color:var(--danger);margin-top:8px;min-height:16px}
+.userbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray)}
+.userbar b{color:var(--dark)}
+
 </style>
 </head>
 <body>
@@ -180,19 +203,10 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
     </div>
   </div>
 
-  <div class="steps">
-    <div class="step active" data-step="0"><span class="n">①</span>画像</div>
-    <div class="step" data-step="1"><span class="n">②</span>计划</div>
-    <div class="step" data-step="2"><span class="n">③</span>地图</div>
-    <div class="step" data-step="3"><span class="n">④</span>出发</div>
-    <div class="step" data-step="4"><span class="n">⑤</span>点菜记账</div>
-    <div class="step" data-step="5"><span class="n">⑥</span>余卡排行</div>
-  </div>
-
   <!-- Step 0 画像 -->
   <div class="card" id="step0">
-    <h2>先认识一下你</h2>
-    <div class="sub">AI 采集信息后，会生成你的每日食谱与运动任务</div>
+    <h2>我的信息</h2>
+    <div class="sub">随时可改；改完保存后自动重新生成食谱与运动任务</div>
     <div class="row">
       <div class="col"><label>当前体重 (kg)</label><input id="pWeight" type="number" value="100"></div>
       <div class="col"><label>目标体重 (kg)</label><input id="pGoal" type="number" value="75"></div>
@@ -219,12 +233,21 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
         <select id="pEat"><option>正常吃</option><option>少量控制</option><option>严格控制</option></select>
       </div>
     </div>
-    <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="goStep(1)">生成我的食谱与运动任务 →</button>
+    <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="finishProfile()">保存并返回今日 →</button>
+    <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="clearAllData()">清空所有记录，重新开始</button>
+    <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
+      <div class="userbar">账号：<b id="acctName">本地模式</b></div>
+      <button id="logoutBtn" class="btn btn-ghost btn-block" style="margin-top:8px" onclick="logout()">退出登录</button>
+    </div>
   </div>
 
   <!-- Step 1 计划 -->
   <div class="card hidden" id="step1">
-    <h2>你的今日计划</h2>
+    <div class="date-bar">
+      <h2 style="margin:0">你的今日计划</h2>
+      <span class="date-pill" id="datePill">第 1 天</span>
+      <button class="btn btn-ghost" onclick="nextDay()">模拟下一天 →</button>
+    </div>
     <div class="sub" id="planSub"></div>
     <div id="loanWarn"></div>
     <div id="planWarn"></div>
@@ -248,10 +271,9 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
       <span id="earnedShow" class="hint">今日已赚余量：<b style="color:var(--green2)">+0</b> 千卡</span>
       <span id="earnedDetail" class="hint"></span>
     </div>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-ghost" onclick="goStep(0)">← 修改画像</button>
-      <button class="btn btn-accent" style="flex:1" onclick="goStep(2)">直接进地图逛逛 →</button>
-    </div>
+    <h3>给食谱提意见</h3>
+    <div class="sub">比如「吃腻面条了」，AI 会记住并避开，食谱越用越合你口味</div>
+    <div id="feedbackBox"></div>
   </div>
 
   <!-- Step 2 地图 -->
@@ -362,17 +384,26 @@ input[type=number]:focus,select:focus{border-color:var(--primary)}
       <div class="box deposit"><div class="lbl">存款（余卡）</div><div class="v" id="totalDeposit">0</div></div>
       <div class="box loan"><div class="lbl">借款</div><div class="v" id="totalLoan">0</div></div>
     </div>
-    <h2 style="margin-top:8px">余卡排行榜 · 本月最终余卡（模拟）</h2>
-    <div class="sub">存钱基因：数字摆在那，就想让它变大。点开任意一行看成功率</div>
+    <h2 style="margin-top:8px">我的真实数据</h2>
+    <div class="sub">点开看本月减重分析报告</div>
     <div id="rankList"></div>
+    <h2 style="margin-top:8px">每日记录</h2>
+    <div class="sub">点下面的「📋 点我看记录」展开每日每餐 + 运动</div>
+    <div id="dailyTable"></div>
+    <h2 style="margin-top:8px">模拟示例排行（参考）</h2>
+    <div class="mock-note2">下面是模拟数据，仅供参考；真实榜单待接入用户系统</div>
+    <div id="mockRankList"></div>
     <button class="btn btn-accent btn-block" style="margin:14px 0" onclick="shareResult()">📤 分享我的成绩</button>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn btn-ghost" onclick="goStep(1)">← 回到计划（借款已收紧额度）</button>
-      <button class="btn btn-primary" style="flex:1" onclick="resetDemo()">再来一轮 →</button>
-    </div>
+    <button class="btn btn-ghost btn-block" onclick="goStep(1)">← 回到今日</button>
   </div>
 
   <div class="foot">卡路里之路 · Demo　|　地图距离+时间算消耗 · 拍照估卡+成功率 · 余卡货币 · 排行榜<br>接入高德 JS API 后显示真实地图、POI 搜店与步行路径</div>
+</div>
+
+<div class="tabbar">
+  <div class="tab" data-tab="1" onclick="goStep(1)">🥗 今日</div>
+  <div class="tab" data-tab="5" onclick="goStep(5)">📊 总结</div>
+  <div class="tab" data-tab="0" onclick="goStep(0)">👤 我的</div>
 </div>
 
 <script>
@@ -396,6 +427,16 @@ const state = {
   order:{items:[],extras:[],intake:0},
   balance:{deposit:0,loan:0,history:[]},
   earnedSurplus:0, earnedLog:[],
+  dayIndex:0,                    // 当前第几天（0 起）
+  currentMeal:'午',              // 当前正在升级的餐
+  todayMeals:{早:null,午:null,晚:null},  // 每餐记录 {upgraded,intake,burn,surplus,shop} 或 null（未升级=按食谱）
+  dayRecords:[],                         // 每日记录 [{day, meals:{早,午,晚}, earnedSurplus, earnedLog, daySurplus}]
+  startDate:'',                          // 起始日期（ISO，如 2026-09-21）
+  user:null,                             // 登录用户 {name, token}
+  serverBase:'',                         // 后端地址（App 用；网页留空走同源）
+  dislikes:[],                           // 食谱忌口/厌倦关键词
+  wants:[],                              // 想吃的关键词（每天只安排一顿）
+  upgradeDays:[],                        // 有升级行为的日期（用于触发提意见）
   timerId:null,
 };
 
@@ -485,32 +526,74 @@ function metByMode(mode,kmh){
   if(kmh<16)return 4.0; if(kmh<19)return 6.8; return 8.0;
 }
 function burn(kg, met, hours){ return Math.round(met*kg*hours); }
-function successRate(burnCal,intake){
-  const surplus = burnCal - intake;
-  if(surplus<0){ const r=Math.max(5, Math.round(30 + surplus/intake*100)); return {rate:r, level:'over', label:'透支，记借款', color:'#c03a2b'}; }
-  const ratio = surplus/intake;
-  if(ratio<0.15) return {rate:40, level:'tight', label:'刚好卡线，吃完可能超支', color:'#ff7a45'};
-  if(ratio<0.30) return {rate:75, level:'ok', label:'有余量，基本放心', color:'#2e8b74'};
-  return {rate:95, level:'great', label:'余量足，放心吃', color:'#5fd4b2'};
+function erf(x){
+  const sign = x<0 ? -1 : 1;
+  x = Math.abs(x);
+  const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p=0.3275911;
+  const t = 1/(1+p*x);
+  const y = 1 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normCdf(x){ return 0.5*(1+erf(x/Math.sqrt(2))); }
+function clip01(x){ return Math.max(0, Math.min(1, x)); }
+/**
+ * 单元格级减重统计（定稿算法 C）
+ * 单元格可为「餐」或「天」——本 App 用「天」作一格，对齐记账软件的每日汇总口径。
+ * @param {{toLose:number, nMeals:number}} pl  nMeals = 单元格数（本 App = 天数）
+ * @param {number} D          每格计划缺口（千卡）
+ * @param {number} muMeal     每格余卡期望（千卡，正=比计划少吃）
+ * @param {number} sigmaMeal  每格余卡标准差（千卡）
+ */
+function weightLossReport(pl, D, muMeal, sigmaMeal, exerciseKC){
+  const n = pl.nMeals;
+  const ex = exerciseKC || 0;           // 运动卡数之和（把概率不等式的右侧左移 ex）
+  const fullKC = 7700 * pl.toLose;      // 整目标热量
+  const halfKC = 7700 * pl.toLose / 2;  // 一半目标热量
+
+  const muSurp    = muMeal * n;                     // 逐餐期望累加
+  const sigmaSurp = sigmaMeal * Math.sqrt(n);       // √(Σ 每餐方差)
+
+  const pAt = t => sigmaSurp===0
+      ? (muSurp>=t?1:0)
+      : clip01(1 - normCdf((t - muSurp) / sigmaSurp));  // P(X ≥ t)
+
+  const thinProb = pAt(-fullKC - ex);  // 会瘦： 真实余卡 > -(目标 + 运动)
+  const halfProb = pAt(-halfKC - ex);  // 达标一半
+  const hitProb  = pAt(0 - ex);        // 达标： 真实余卡 > -运动
+
+  const lo = muSurp - 1.96*sigmaSurp;
+  const hi = muSurp + 1.96*sigmaSurp;
+  const kg = x => Math.max(0, x/7700 + pl.toLose);
+
+  return {
+    hitProb,
+    halfProb,
+    thinProb,
+    // 区间整体平移 +运动（与概率口径一致：减重 = toLose + (X+运动)/7700）
+    conf95_kg: [ kg(lo + ex), kg(hi + ex) ]
+  };
 }
 
 /* ================= 步骤切换 ================= */
+function mealNameOf(tag){ return {早:'早餐',午:'午餐',晚:'晚餐'}[tag]||tag; }
+function dateStr(dayNum){
+  const base = state.startDate ? new Date(state.startDate+'T00:00:00') : new Date();
+  base.setDate(base.getDate() + (dayNum-1));
+  return `${base.getMonth()+1}月${base.getDate()}日`;
+}
 function setSteps(cur){
-  document.querySelectorAll('.step').forEach(el=>{
-    const n=+el.dataset.step;
-    el.classList.toggle('active', n===cur);
-    el.classList.toggle('done', n<cur);
-  });
   for(let i=0;i<6;i++){ $('step'+i).classList.toggle('hidden', i!==cur); }
+  document.querySelectorAll('.tab').forEach(t=>{ t.classList.toggle('active', +t.dataset.tab===cur); });
 }
 function goStep(n){
   setSteps(n);
+  if(n===0 && $('acctName')){ $('acctName').textContent = state.user ? state.user.name : '本地模式'; const lb=$('logoutBtn'); if(lb) lb.style.display = state.user ? '' : 'none'; }
   if(n===1) renderPlan();
   if(n===2){
     if(!state.upgradeFrom){
       const pl=state.plan||buildPlan();
-      const lunch=pl.meals[1];
-      state.upgradeFrom={meal:'本餐', kcal:lunch.kcal};
+      const meal=pl.meals.find(m=>m.tag===state.currentMeal)||pl.meals[1];
+      state.upgradeFrom={meal:mealNameOf(state.currentMeal), kcal:meal.kcal};
       $('mapTitle').textContent='选一顿想吃的：用运动挣额度，走得越远吃越好';
     }
     renderShops(); ensureMap(); addMarkers();
@@ -556,28 +639,113 @@ function buildPlan(){
       exercise.push({n: n + ' ' + dur + ' 分钟', k: kcal, steps: s});
     });
   });
-  return { bmr, deficit, budget, months, weekly, aggressive, taskSteps, meals:[
+  const sigmaDay = Math.round(budget * 0.25);
+  return { bmr, deficit, budget, months, weekly, aggressive, taskSteps, days, toLose, sigmaDay, meals:[
     {tag:'早', name:r.b, kcal:base.breakfast, cls:'b'},
     {tag:'午', name:r.l, kcal:base.lunch, cls:'l'},
     {tag:'晚', name:r.d, kcal:base.dinner, cls:'d'},
   ], exercise };
 }
+/* 餐次适配：早餐只推早餐类，午/晚不推纯饮品/点心 */
+const BF_KW=/蛋|粥|豆浆|牛奶|酸奶|麦片|燕麦|三明治|吐司|面包|牛角|贝果|煎饼|油条|馒头|花卷|肠粉|小笼|饺|馄饨|咖啡|拿铁|美式|卡布|水果|羹|藜麦/;
+const LIGHT_ONLY=/可乐|绿茶|奶茶|鲜奶|豆花|咖啡|拿铁|美式|卡布|豆浆|果汁|牛角|酸奶|麦片|燕麦|薯条/;
+function mealFits(tag, name){
+  const n=String(name||'');
+  if(tag==='早') return BF_KW.test(n);
+  return !LIGHT_ONLY.test(n);
+}
+/* 主菜要配饭：蔬菜/肉类等「菜」类一般配一碗米饭 */
+const STAPLE_KW=/饭|面|粉|米线|河粉|包|饼|饺|馄饨|寿司|饭团|套餐|汉堡|三明治|粥|披萨|卷|沙拉|汤/;
+const DISH_KW=/肉|鸡|鸭|鱼|虾|牛|猪|羊|排骨|蛋|豆腐|时蔬|蔬菜|菇|锅|菜|虾滑|豆皮|牛油果/;
+function needsRice(name){
+  const n=String(name||'');
+  if(STAPLE_KW.test(n)) return false;
+  return DISH_KW.test(n);
+}
+/* 减肥倾向：健康食材加分，重油/重糖减分 */
+const HEALTHY_KW=/沙拉|鸡胸|蔬菜|时蔬|清汤|白灼|蒸|煮|菌菇|豆腐|虾|鱼|藜麦|无糖|低卡|凉拌|牛油果|蔬菜拼盘|生菜/;
+const HEAVY_KW=/红烧|炸|五花|肥|麻辣|黑糖|珍珠|芝士|奶油|黄油|酥|锅底|拌饭|炸鸡/;
+function healthScore(name){
+  const n=String(name||''); let s=0;
+  if(HEALTHY_KW.test(n)) s-=60;
+  if(HEAVY_KW.test(n)) s+=80;
+  return s;
+}
+function pickClosest(arr, kcal){
+  let bi=0;
+  arr.forEach((x,i)=>{ if(Math.abs(x.kcal-kcal)<Math.abs(arr[bi].kcal-kcal)) bi=i; });
+  return arr[bi];
+}
+// 想吃 与 菜品名 的宽松匹配（如 面条→清汤牛肉面）
+function wantMatch(dish, w){
+  dish=String(dish||''); w=String(w||'');
+  if(!w) return false;
+  if(dish.includes(w) || w.includes(dish)) return true;
+  return dish.includes(w[0]);
+}
+// 伪随机：同一天固定，不同天不同（让食谱每天有变化）
+function seededRand(seed){ const x=Math.sin(seed*12.9898)*43758.5453; return x-Math.floor(x); }
+function pickVaried(arr, kcal, seed, healthy){
+  const score=healthy ? (x=>Math.abs(x.kcal-kcal)+healthScore(x.dish)) : (x=>Math.abs(x.kcal-kcal));
+  const sorted=arr.slice().sort((a,b)=>score(a)-score(b));
+  const top=sorted.slice(0, Math.min(3, sorted.length));
+  return top[Math.floor(seededRand(seed)*top.length)];
+}
 function buildRecommendations(pl){
   const map={早:null,午:null,晚:null};
   if(!state.restaurants.length) return map;
-  const all=[];
-  state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>all.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist})); });
-  if(!all.length) return map;
-  pl.meals.forEach(m=>{
-    let bi=0;
-    all.forEach((x,i)=>{ if(Math.abs(x.kcal-m.kcal)<Math.abs(all[bi].kcal-m.kcal)) bi=i; });
-    map[m.tag]=all[bi];
-    all.splice(bi,1);
+  const dis=state.dislikes||[];
+  const blocked=n=>dis.some(w=>w&&n.indexOf(w)>=0);
+  let pool=[];
+  state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>{ if(!blocked(d.n)) pool.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist}); }); });
+  if(!pool.length) state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>pool.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist})); });
+  if(!pool.length) return map;
+
+  // 「想吃」：每个偏好一天只占用一顿（选最合适、热量最接近的餐次）
+  (state.wants||[]).forEach(w=>{
+    w=String(w).trim(); if(!w) return;
+    const avail=pl.meals.filter(m=>!map[m.tag]);
+    if(!avail.length) return;
+    let bestTag='', bestRec=null, bestScore=Infinity;
+    avail.forEach(m=>{
+      const hit=pool.filter(x=>wantMatch(x.dish,w));
+      if(!hit.length) return;
+      const fit=hit.filter(x=>mealFits(m.tag,x.dish));
+      const rec=pickClosest(fit.length?fit:hit, m.kcal);
+      const score=Math.abs(rec.kcal-m.kcal)-(fit.length?60:0);
+      if(score<bestScore){ bestScore=score; bestTag=m.tag; bestRec=rec; }
+    });
+    if(bestRec){ map[bestTag]=bestRec; const gi=pool.indexOf(bestRec); if(gi>=0) pool.splice(gi,1); return; }
+    // 附近菜单没有想吃的 → 直接按「想吃」安排到最合适的一餐（热量按该餐额度）
+    const m=avail.find(x=>mealFits(x.tag,w)) || avail[0];
+    map[m.tag]={shop:'自选', dish:w, kcal:m.kcal, dist:null};
+  });
+
+  // 其余餐次：按餐次适配 + 热量接近 + 偏减肥，且不重复；按天伪随机保证每天有变化
+  pl.meals.forEach((m,mi)=>{
+    if(map[m.tag]||!pool.length) return;
+    const fit=pool.filter(x=>mealFits(m.tag,x.dish));
+    let base=fit.length?fit:pool;
+    const clean=base.filter(x=>!HEAVY_KW.test(x.dish));   // 默认尽量避开重油重糖
+    if(clean.length) base=clean;
+    const rec=pickVaried(base, m.kcal, (state.dayIndex+1)*97 + mi*13, true);
+    map[m.tag]=rec;
+    const gi=pool.indexOf(rec); if(gi>=0) pool.splice(gi,1);
+  });
+
+  // 午/晚若是「菜」类（红烧肉/宫保鸡丁…）自动配一碗米饭
+  ['午','晚'].forEach(t=>{
+    const r=map[t];
+    if(r && r.dist!=null && needsRice(r.dish)){
+      map[t]={shop:r.shop, dish:r.dish+' ＋ 米饭(一碗)', kcal:r.kcal+230, dist:r.dist, rice:true};
+    }
   });
   return map;
 }
 function renderPlan(){
+  recomputeBalance();
   const pl=state.plan=buildPlan();
+  $('datePill').textContent=dateStr(state.dayIndex+1)+` · 第${state.dayIndex+1}天`;
   $('planSub').textContent=`希望 ${pl.months} 个月从 ${state.profile.weight}kg 瘦到 ${state.profile.goal}kg · 口味「${state.profile.taste}」· 运动「${(state.profile.sports||[]).join('、')}」`;
   $('loanWarn').innerHTML = state.balance.loan>0
     ? `<div class="loan-warn">⚠ 你有 <b>${state.balance.loan}</b> 千卡借款未还，本次午/晚餐额度已各收紧 ${Math.min(Math.round(state.balance.loan*0.1),150)} 千卡</div>` : '';
@@ -594,24 +762,36 @@ function renderPlan(){
   const mealNames={早:'早餐',午:'午餐',晚:'晚餐'};
   pl.meals.forEach(m=>{
     const rec=recs[m.tag];
+    const record=state.todayMeals[m.tag];
     const name=rec?rec.dish:m.name;
     const kcal=rec?rec.kcal:m.kcal;
-    const distTxt=rec?(rec.dist>=1000?(rec.dist/1000).toFixed(1)+'km':rec.dist+'m'):'';
-    const sub=rec?`附近 ${distTxt} · ${rec.shop}`:'地图数据加载中，稍后自动推荐附近低卡美食…';
+    const distTxt=rec&&rec.dist!=null?(rec.dist>=1000?(rec.dist/1000).toFixed(1)+'km':rec.dist+'m'):'';
+    const baseSub=rec?(rec.dist==null?'按你想吃的安排 · 热量按本餐额度':`附近 ${distTxt} · ${rec.shop}`):'地图数据加载中，稍后自动推荐附近低卡美食…';
+    const upgraded=record&&record.upgraded;
+    const statusTag=upgraded?'<span class="meal-tag done">已升级</span>':'<span class="meal-tag recipe">按食谱</span>';
+    const kcalShow=upgraded?record.intake:kcal;
+    const subShow=upgraded
+      ? `${record.shop||'自定义'} · 实际摄入 ${record.intake} 千卡，余量 ${record.surplus>=0?'+':''}${record.surplus}`
+      : baseSub;
     const d=document.createElement('div');
     d.className='meal';
     d.innerHTML=`<div class="icon ${m.cls}">${m.tag}</div>
-      <div class="info"><div class="m-name">${name}${rec?' <span class="tag green">附近低卡</span>':''}</div>
-      <div class="m-sub">${sub}</div></div>
-      <div class="kcal">${kcal}<small style="font-size:11px;color:var(--gray);font-weight:400"> 千卡</small></div>`;
+      <div class="info"><div class="m-name">${name}${statusTag}${rec?(rec.dist==null?' <span class="tag green">想吃</span>':' <span class="tag green">附近低卡</span>'):''}</div>
+      <div class="m-sub">${subShow}</div></div>
+      <div class="kcal">${kcalShow}<small style="font-size:11px;color:var(--gray);font-weight:400"> 千卡</small></div>`;
     const b=document.createElement('div');
-    b.innerHTML=`<button class="upgrade-btn">我要升级 →</button>`;
-    b.onclick=()=>{
-      state.upgradeFrom={meal:mealNames[m.tag], kcal:m.kcal};
-      $('mapTitle').textContent=`${mealNames[m.tag]}升级：去「${rec?rec.shop:''}」吃 ${rec?rec.dish:''}`;
-      $('mapSub').textContent=`走到店的消耗是额外的「余量」加成，不占这顿饭额度`;
-      goStep(2);
-    };
+    if(upgraded){
+      b.innerHTML=`<button class="btn btn-ghost" style="width:100%">已记账 ✓</button>`;
+    } else {
+      b.innerHTML=`<button class="upgrade-btn">我要升级 →</button>`;
+      b.onclick=()=>{
+        state.currentMeal=m.tag;
+        state.upgradeFrom={meal:mealNames[m.tag], kcal:m.kcal};
+        $('mapTitle').textContent=`${mealNames[m.tag]}升级：去「${rec&&rec.dist!=null?rec.shop:'附近店'}」吃 ${rec?rec.dish:''}`;
+        $('mapSub').textContent=`走到店的消耗是额外的「余量」加成，不占这顿饭额度`;
+        goStep(2);
+      };
+    }
     d.appendChild(b);
     mc.appendChild(d);
   });
@@ -623,6 +803,14 @@ function renderPlan(){
     d.innerHTML=`<div class="t-name">${t.n}${t.steps?'（约 '+t.steps+' 步）':''}</div><div class="t-kcal">约 −${t.k} 千卡</div>`;
     el.appendChild(d);
   });
+  updateEarnedShow();
+  $('feedbackBox').innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="fbInput" placeholder="如：吃腻面条了 / 想吃水饺" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;outline:none">
+      <button class="btn btn-ghost" onclick="submitRecipeFeedback()">提意见</button>
+    </div>
+    ${(state.dislikes&&state.dislikes.length)?`<div class="hint" style="margin-top:4px">已避开：${state.dislikes.join('、')}</div>`:''}
+    ${(state.wants&&state.wants.length)?`<div class="hint" style="margin-top:4px;color:var(--green2)">想吃：${state.wants.join('、')}（每天安排一顿）</div>`:''}`;
 }
 function maybeRefreshPlan(){
   if(!$('step1').classList.contains('hidden')) renderPlan();
@@ -883,6 +1071,29 @@ function searchFood(){
       }
       renderShops(); ensureMap(); addMarkers();
       enrichDistances();
+    });
+  });
+}
+// 按「想吃」去地图搜索附近店，并把结果并入餐厅列表（供食谱推荐用）
+function searchWant(kw){
+  return new Promise(resolve=>{
+    const c=state.location||DEFAULT_CENTER;
+    const have=name=>state.restaurants.some(r=>r.name===name);
+    if(!state.hasAmap || !state.amap){
+      const ms=mockShopsAround(c).filter(sh=> wantMatch(sh.name,kw) || (sh.menu&&sh.menu.some(m=>wantMatch(m.n,kw))));
+      ms.forEach(m=>{ if(!have(m.name)) state.restaurants.push(m); });
+      resolve(ms.length>0); return;
+    }
+    const AMap=state.amap;
+    AMap.plugin('AMap.PlaceSearch',()=>{
+      const ps=new AMap.PlaceSearch({pageSize:10});
+      ps.searchNearBy(kw,[c.lng,c.lat],3000,(status,result)=>{
+        let added=0;
+        if(status==='complete' && result.poiList && result.poiList.pois.length){
+          mapPois(result.poiList.pois, c).forEach(f=>{ if(!have(f.name)){ state.restaurants.push(f); added++; } });
+        }
+        resolve(added>0);
+      });
     });
   });
 }
@@ -1169,25 +1380,217 @@ function settle(){
   const b=budgetInfo();
   const surplus=b.budget-state.order.intake; // 正=存款 负=借款
   if(surplus>=0) state.balance.deposit+=surplus; else state.balance.loan+=-surplus;
+  // 存款自动抵借款（灵活记账）
+  const repay=Math.min(state.balance.deposit, state.balance.loan);
+  if(repay>0){ state.balance.deposit-=repay; state.balance.loan-=repay; }
   state.balance.history.push({shop:state.selected.name, base:b.base, burn:b.burnCal, budget:b.budget, intake:state.order.intake, surplus});
-  const over=surplus<0;
-  $('balanceBox').innerHTML=`<div class="lbl">本次结果：原额度 ${b.base} ＋ 走到店 ${b.burnCal} ＋ 今日运动 ${b.earned} ＝ 可吃 ${b.budget}，实际吃了 ${state.order.intake}</div>
-    <div class="big-num" style="color:${over?'#ff9a86':'#5fd4b2'}">${over?'−':'+'}${Math.abs(surplus)} 千卡</div>
-    <div style="font-size:12px;color:#bfd6d1">${over?'借款：欠卡了，下次食谱额度会收紧':'存款：余卡存起来了，随时能吃顿好的'}</div>`;
-  goStep(5);
+  state.todayMeals[state.currentMeal]={
+    upgraded:true, intake:state.order.intake, burn:b.burnCal, surplus,
+    shop:state.selected?state.selected.name:''
+  };
+  let msg=`${mealNameOf(state.currentMeal)}已记账：${surplus>=0?'+':''}${surplus} 千卡`;
+  if(repay>0) msg+=`，已还借款 ${repay}`;
+  toast(msg);
+  state.order={items:[],extras:[],intake:0};
+  state.trip={mode:'walk',start:0,elapsed:0,burn:0,speed:0,met:0};
+  state.selected=null; state.distance=0;
+  state.upgradeFrom=null; state.photoNote='';
+  $('startBtn').disabled=false; $('arriveBtn').classList.add('hidden');
+  bumpUpgradeDay();
+  persistState();
+  goStep(1);
+  setTimeout(checkFeedbackTrigger, 500);
 }
 
 /* ================= 排行榜 ================= */
+// 收集所有已记录的餐卡数（含今日，未升级=食谱），逐餐直接累加 μ 与 σ²（不取平均）
+function intakeStats(){
+  const pl=state.plan||buildPlan();
+  const meals=[], sum={早:0,午:0,晚:0}, cnt={早:0,午:0,晚:0};
+  state.dayRecords.forEach(d=>{ ['早','午','晚'].forEach(t=>{ if(d.meals&&d.meals[t]){ meals.push(d.meals[t].intake); sum[t]+=d.meals[t].intake; cnt[t]++; } }); });
+  ['早','午','晚'].forEach(t=>{
+    const r=state.todayMeals[t]; const meal=pl.meals.find(m=>m.tag===t);
+    const intake=(r&&r.upgraded)?r.intake:(meal?meal.kcal:pl.budget/3);
+    meals.push(intake); sum[t]+=intake; cnt[t]++;
+  });
+  const N=meals.length, K=Math.max(1,N/3);
+  const sumMu=meals.reduce((s,x)=>s+x,0);      // Σ μ_i（直接累加）
+  const sumMu2=meals.reduce((s,x)=>s+x*x,0);   // Σ μ_i²（用于 Σσ²=0.09Σμ²）
+  const avgMeals={早:0,午:0,晚:0};
+  ['早','午','晚'].forEach(t=>{ avgMeals[t]=cnt[t]?sum[t]/cnt[t]:pl.budget/3; });
+  return { N, K, sumMu, sumMu2, avgMeals };
+}
+// 运动卡数：各日赚余量 + 今日赚余量 + 各餐走到店消耗
+function exerciseSum(){
+  let ex=0;
+  state.dayRecords.forEach(d=>{
+    ex+=(d.earnedSurplus||0);
+    ['早','午','晚'].forEach(t=>{ const m=d.meals&&d.meals[t]; if(m&&m.burn) ex+=m.burn; });
+  });
+  ex+=(state.earnedSurplus||0);
+  ['早','午','晚'].forEach(t=>{ const r=state.todayMeals[t]; if(r&&r.burn) ex+=r.burn; });
+  return ex;
+}
+// 累计余卡 = Σ(食物余卡 + 运动)，含历史每日 + 今日
+function cumulativeSurplus(){
+  const pl=state.plan||buildPlan();
+  const baseOf=t=>((pl.meals.find(x=>x.tag===t)||{}).kcal)||0;
+  let food=0, ex=0;
+  state.dayRecords.forEach(r=>{
+    ['早','午','晚'].forEach(t=>{
+      const m=r.meals&&r.meals[t];
+      if(m&&m.upgraded){ food+=(baseOf(t)-m.intake); ex+=(m.burn||0); }
+    });
+    ex+=(r.earnedSurplus||0);
+  });
+  ['早','午','晚'].forEach(t=>{
+    const r=state.todayMeals[t];
+    if(r&&r.upgraded){ food+=(baseOf(t)-r.intake); ex+=(r.burn||0); }
+  });
+  ex+=(state.earnedSurplus||0);
+  return food+ex;
+}
+function recomputeBalance(){
+  const net=cumulativeSurplus();
+  state.balance.deposit=Math.max(0,net);
+  state.balance.loan=Math.max(0,-net);
+}
+function appendRankRow(list, u, pos, isMe, analysisHtml, label){
+  const row=document.createElement('div');
+  row.className='rank-row'+(isMe?' me':'');
+  row.innerHTML=`<div class="pos ${pos===1?'gold':''}">${pos}</div>
+    <div class="nm">${u.nm}${analysisHtml?'<div style="font-size:10px;color:var(--accent);font-weight:700">📊 点我看分析报告</div>':''}</div>
+    <div class="val">${u.month>=0?'+':''}${u.month}<small style="font-size:11px;color:var(--gray);font-weight:400"> ${label||'累计'}</small></div>`;
+  const det=document.createElement('div');
+  det.className='rank-detail';
+  det.innerHTML=`<div class="d-line"><span>累计余卡</span><b style="color:var(--primary)">${u.month>=0?'+':''}${u.month} 千卡</b></div>
+    ${analysisHtml||''}
+    <div class="story">${u.story}</div>`;
+  row.onclick=()=>det.classList.toggle('open');
+  list.appendChild(row);
+  list.appendChild(det);
+}
 function renderRank(){
+  recomputeBalance();   // 累计余卡 = Σ(食物余卡 + 运动)
   $('totalDeposit').textContent=state.balance.deposit;
   $('totalLoan').textContent=state.balance.loan;
-  const myMonth = Math.round((state.balance.deposit - state.balance.loan) * 30);
+
+  const pl=state.plan||buildPlan();
+  const surplus=state.balance.deposit-state.balance.loan;
+  const days=pl.days;
+  const st=intakeStats();
+  const scale=days/st.K;
+  const sumVar=0.09*st.sumMu2;                        // Σσ² = Σ(0.3μᵢ)²（逐餐直接累加）
+  const muA=Math.round(st.sumMu*scale);               // 实际总摄入期望（投影到 days 天）
+  const sigmaA=Math.round(Math.sqrt(sumVar*scale));   // 实际总摄入标准差
+  const plannedIntake=pl.budget*days;                 // 计划总摄入
+  const muX=plannedIntake-muA;                        // 真实余卡期望
+  const dailyIntake=st.sumMu/st.K;
+  const dailyStd=Math.sqrt(sumVar/st.K);
+  const exProj=Math.round(exerciseSum()*scale);   // 运动卡数（投影到 days 天）
+  const rep=weightLossReport({toLose:pl.toLose, nMeals:days}, 0, pl.budget-dailyIntake, dailyStd, exProj);
+  const pct=x=>(x*100).toFixed(1)+'%';
+  const pc=x=> x>0.7?'var(--green2)':(x>0.4?'var(--accent)':'var(--danger)');
+  const z=t=>((t-muX)/sigmaA).toFixed(2);
+
+  // 今日总结：余卡 = 食物余卡 + 运动
+  const todayFood=['早','午','晚'].reduce((s,t)=>{
+    const r=state.todayMeals[t]; if(!(r&&r.upgraded)) return s;
+    const base=(pl.meals.find(x=>x.tag===t)||{}).kcal||0; return s+(base-r.intake);
+  },0);
+  const todayEx=(state.earnedSurplus||0)+['早','午','晚'].reduce((s,t)=>s+((state.todayMeals[t]&&state.todayMeals[t].burn)||0),0);
+  const todaySurplus=todayFood+todayEx;
+  const mealLines=['早','午','晚'].map(t=>{
+    const r=state.todayMeals[t];
+    const meal=pl.meals.find(m=>m.tag===t);
+    if(r&&r.upgraded) return `· ${mealNameOf(t)}：已升级，摄入 ${r.intake} 千卡，食物余卡 ${(meal.kcal-r.intake)>=0?'+':''}${meal.kcal-r.intake}`;
+    return `· ${mealNameOf(t)}：按食谱（${meal?meal.kcal:0} 千卡）`;
+  }).join('<br>');
+  $('balanceBox').innerHTML=`<div class="lbl">今日总结（${dateStr(state.dayIndex+1)}）</div>
+    <div style="font-size:13px;color:#bfd6d1;line-height:1.9">${mealLines}</div>
+    <div style="margin-top:8px;font-size:15px;font-weight:800;color:${todaySurplus>=0?'#5fd4b2':'#ff9a86'}">今日净余卡 ${todaySurplus>=0?'+':''}${todaySurplus} 千卡</div>
+    <div style="font-size:12px;color:#bfd6d1;margin-top:2px">食物余卡 ${todayFood>=0?'+':''}${todayFood} ＋ 运动 ${todayEx} ＝ ${todaySurplus>=0?'+':''}${todaySurplus}</div>`;
+
+  // 真实：我（含分析报告）
   const h=state.balance.history;
-  const myRate = h.length ? Math.round(h.filter(x=>x.surplus>=0).length/h.length*100) : null;
-  const last=h[h.length-1];
-  const myStory = last
-    ? `最近一笔：走到「${last.shop}」消耗 ${last.burn} 千卡，${last.surplus>=0?'余卡 +'+last.surplus:'借款 −'+(-last.surplus)}`
-    : '完成第一笔记录后，这里会生成你的炫耀卡';
+  const myRate=h.length?Math.round(h.filter(x=>x.surplus>=0).length/h.length*100):null;
+  const me={nm:'我（'+state.profile.weight+'kg）', month:surplus, rate:myRate, story:`已打卡 ${state.dayIndex+1} 天 · 累计 ${h.length} 笔记账`};
+  const analysisHtml=`<div style="font-size:12px;font-weight:700;color:var(--dark);margin:8px 0 4px">📅 若保持现状，计划时限后（${days} 天）</div>
+    <div class="d-line"><span>达标概率（减 ${pl.toLose}kg）</span><b style="color:${pc(rep.hitProb)}">${pct(rep.hitProb)}</b></div>
+    <div class="d-line"><span>达标一半概率（减 ${(pl.toLose/2).toFixed(1)}kg）</span><b style="color:${pc(rep.halfProb)}">${pct(rep.halfProb)}</b></div>
+    <div class="d-line"><span>会瘦概率（减 1g 也算）</span><b style="color:${pc(rep.thinProb)}">${pct(rep.thinProb)}</b></div>
+    <div class="d-line"><span>95% 减重区间</span><b style="color:var(--primary)">${rep.conf95_kg[0].toFixed(1)} ~ ${rep.conf95_kg[1].toFixed(1)} kg</b></div>
+    <div class="calc-title">📐 计算过程（逐餐直接累加 + 中心极限定理）</div>
+    <div class="calc">已记录 ${st.N} 餐（约 ${st.K} 天），未升级的餐按食谱计入</div>
+    <div class="calc">Σμ = μ₁ + μ₂ + … + μ_${st.N} = ${Math.round(st.sumMu)} 千卡</div>
+    <div class="calc">Σσ² = Σ(0.3 × μᵢ)² = ${Math.round(sumVar)} 千卡²</div>
+    <div class="calc">投影到 ${days} 天：实际总摄入 A ~ N(${muA}, ${sigmaA}²)</div>
+    <div class="calc">计划总摄入 = ${pl.budget} × ${days} = ${plannedIntake} 千卡</div>
+    <div class="calc">真实余卡 X（不含运动）= 计划 − 实际 ~ N(${muX}, ${sigmaA}²)</div>
+    <div class="calc">运动卡数之和 = ${exProj} 千卡（计入不等式右侧）</div>
+    <div class="calc">达标 P(X &gt; ${-exProj}) = 1−Φ(${z(-exProj)}) = ${pct(rep.hitProb)}</div>
+    <div class="calc">减半 P(X &gt; ${Math.round(-7700*pl.toLose/2-exProj)}) = 1−Φ(${z(-7700*pl.toLose/2-exProj)}) = ${pct(rep.halfProb)}</div>
+    <div class="calc">会瘦 P(X &gt; ${Math.round(-7700*pl.toLose-exProj)}) = 1−Φ(${z(-7700*pl.toLose-exProj)}) = ${pct(rep.thinProb)}</div>
+    <div class="calc">期望减重 = ${pl.toLose} + (${muX} + 运动 ${exProj}) ÷ 7700 = ${(pl.toLose+(muX+exProj)/7700).toFixed(1)} kg</div>
+    <div class="calc">95% = ${muX} ± 1.96×${sigmaA}；减重区间整体 + 运动 ${(exProj/7700).toFixed(2)}kg → ${rep.conf95_kg[0].toFixed(1)} ~ ${rep.conf95_kg[1].toFixed(1)} kg</div>`;
+  const list=$('rankList'); list.innerHTML='';
+  appendRankRow(list, me, 1, true, analysisHtml, '累计');
+
+  // 每日记录表（折叠）
+  const dt=$('dailyTable');
+  const cellHtml=m=>m&&m.upgraded?`<span style="color:var(--accent);font-weight:700">升级 ${m.intake}</span>`:`<span style="color:var(--gray)">食谱 ${m?m.intake:'—'}</span>`;
+  const sumBurn=r=>['早','午','晚'].reduce((s,t)=>s+((r.meals&&r.meals[t]&&r.meals[t].burn)||0),0);
+  const pastRows=state.dayRecords.map(r=>{
+    let food=0, burn=0;
+    ['早','午','晚'].forEach(t=>{
+      const m=r.meals&&r.meals[t];
+      if(m&&m.upgraded){ const base=(pl.meals.find(x=>x.tag===t)||{}).kcal||0; food+=(base-m.intake); burn+=(m.burn||0); }
+    });
+    const ex=burn+(r.earnedSurplus||0);
+    const tot=food+ex;   // 余卡 = 食物余卡 + 运动
+    return `<tr style="border-top:1px solid var(--line)">
+      <td style="padding:7px 6px;white-space:nowrap">${dateStr(r.day)}</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(r.meals.早)}</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(r.meals.午)}</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(r.meals.晚)}</td>
+      <td style="padding:7px 6px;text-align:center">${ex}</td>
+      <td style="padding:7px 6px;text-align:center;font-weight:700;color:${tot>=0?'var(--green2)':'var(--danger)'}">${tot>=0?'+':''}${tot}</td>
+    </tr>`;
+  }).join('');
+  const todayCells=['早','午','晚'].map(t=>{
+    const r=state.todayMeals[t]; const meal=pl.meals.find(m=>m.tag===t);
+    return (r&&r.upgraded)?{intake:r.intake,upgraded:true}:{intake:(meal?meal.kcal:0),upgraded:false};
+  });
+  const todayBurn=['早','午','晚'].reduce((s,t)=>s+((state.todayMeals[t]&&state.todayMeals[t].burn)||0),0);
+  const todayRow=`<tr style="background:#eef7f3;border-top:1px solid var(--line)">
+      <td style="padding:7px 6px;white-space:nowrap">${dateStr(state.dayIndex+1)}*</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(todayCells[0])}</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(todayCells[1])}</td>
+      <td style="padding:7px 6px;text-align:center">${cellHtml(todayCells[2])}</td>
+      <td style="padding:7px 6px;text-align:center">${(state.earnedSurplus||0)+todayBurn}</td>
+      <td style="padding:7px 6px;text-align:center;font-weight:700;color:var(--primary)">${todaySurplus>=0?'+':''}${todaySurplus}*</td>
+    </tr>`;
+  dt.innerHTML=`
+    <div class="rank-row" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="nm">📋 点我看记录</div>
+      <div class="val" style="font-size:12px;color:var(--gray)">${state.dayRecords.length+1} 天 ▾</div>
+    </div>
+    <div class="rank-detail">
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:var(--light);color:var(--gray)">
+          <th style="padding:8px 6px;text-align:left;font-weight:700">日期</th>
+          <th style="padding:8px 6px;font-weight:700">早餐</th>
+          <th style="padding:8px 6px;font-weight:700">午餐</th>
+          <th style="padding:8px 6px;font-weight:700">晚餐</th>
+          <th style="padding:8px 6px;font-weight:700">运动</th>
+          <th style="padding:8px 6px;font-weight:700">余卡</th>
+        </tr></thead>
+        <tbody>${pastRows}${todayRow}</tbody>
+      </table></div>
+      <div class="hint" style="margin-top:6px">* 当前天（进行中）；「升级」= 去店实际吃的；余卡 = 餐余量 + 运动（赚余量 + 走到店）</div>
+    </div>`;
+
+  // 模拟排行（含「我」一起排序对比）
   const others=[
     {nm:'隔壁小王', month:15200, rate:88, story:'本月换了 12 顿爱吃的，顿顿在预算内'},
     {nm:'坚持老张', month:9800, rate:81, story:'通勤快走攒卡，月底用余卡吃了顿火锅'},
@@ -1196,39 +1599,23 @@ function renderRank(){
     {nm:'路人甲', month:1200, rate:51, story:'刚起步，稳步前进'},
     {nm:'躺平君', month:-2600, rate:28, story:'借卡太多，额度被收紧'},
   ];
-  const me={nm:'我（'+state.profile.weight+'kg）', month:myMonth, rate:myRate, story:myStory, me:true};
-  const all=[...others,me].sort((a,b)=>b.month-a.month);
-  const list=$('rankList'); list.innerHTML='';
-  all.forEach((u,i)=>{
-    const row=document.createElement('div');
-    row.className='rank-row'+(u.me?' me':'');
-    row.innerHTML=`<div class="pos ${i===0?'gold':''}">${i+1}</div>
-      <div class="nm">${u.nm}${u.me?'（我）':''}</div>
-      <div class="val">${u.month>=0?'+':''}${u.month}<small style="font-size:11px;color:var(--gray);font-weight:400"> 本月</small></div>`;
-    const det=document.createElement('div');
-    det.className='rank-detail';
-    const rateTxt = u.rate==null ? '—（完成记录后计算）' : u.rate+'%';
-    const rateColor = u.rate==null ? '#6b7774' : (u.rate>=75?'#2e8b74':(u.rate>=50?'#ff7a45':'#c03a2b'));
-    det.innerHTML=`<div class="d-line"><span>本月最终余卡</span><b style="color:var(--primary)">${u.month>=0?'+':''}${u.month} 千卡</b></div>
-      <div class="d-line"><span>成功率（吃到想吃且不超预算）</span><b style="color:${rateColor}">${rateTxt}</b></div>
-      <div class="gauge" style="background:var(--light)"><div class="fill" style="width:${u.rate==null?0:u.rate}%;background:${rateColor}"></div></div>
-      <div class="story">${u.story}</div>`;
-    row.onclick=()=>det.classList.toggle('open');
-    list.appendChild(row);
-    list.appendChild(det);
-  });
+  const meMonth=Math.round(surplus/st.K*30);  // 投影到 30 天，与模拟用户同口径
+  const mockAll=[...others, {nm:'我（'+state.profile.weight+'kg）', month:meMonth, rate:myRate, story:`已打卡 ${state.dayIndex+1} 天`, me:true}];
+  mockAll.sort((a,b)=>b.month-a.month);
+  const mlist=$('mockRankList'); mlist.innerHTML='';
+  mockAll.forEach((u,i)=>{ appendRankRow(mlist, u, i+1, !!u.me, '', '本月'); });
 }
 
 /* ================= 分享 ================= */
 function shareResult(){
-  const myMonth = Math.round((state.balance.deposit - state.balance.loan)*30);
+  const myMonth = state.balance.deposit - state.balance.loan;
   const last=state.balance.history[state.balance.history.length-1];
   let txt;
   if(last){
     const s = last.surplus>=0 ? ('余卡还剩 '+last.surplus) : ('透支 '+(-last.surplus)+'（记借款）');
-    txt=`我在「卡路里之路」为爱吃的东西付出努力：走到「${last.shop}」消耗了 ${last.burn} 千卡，${s}！本月模拟最终余卡 ${myMonth>=0?'+':''}${myMonth} 千卡 💪`;
+    txt=`我在「卡路里之路」为爱吃的东西付出努力：走到「${last.shop}」消耗了 ${last.burn} 千卡，${s}！累计余卡 ${myMonth>=0?'+':''}${myMonth} 千卡 💪`;
   } else {
-    txt=`我在「卡路里之路」开始减肥啦！本月模拟最终余卡 ${myMonth>=0?'+':''}${myMonth} 千卡，为爱吃的东西付出有意义努力 💪`;
+    txt=`我在「卡路里之路」开始减肥啦！累计余卡 ${myMonth>=0?'+':''}${myMonth} 千卡，为爱吃的东西付出有意义努力 💪`;
   }
   if(navigator.share){
     navigator.share({title:'卡路里之路', text:txt}).catch(()=>{});
@@ -1251,15 +1638,219 @@ function toast(msg){
 }
 
 /* ================= 初始化 ================= */
-function resetDemo(){
+/* ================= 服务端 + 账号 ================= */
+function apiBase(){
+  if(state.serverBase) return state.serverBase.replace(/\/+$/,'');
+  if(location.protocol==='http:'||location.protocol==='https:') return location.origin;
+  return '';
+}
+async function api(pathname, opts){
+  const base=apiBase();
+  if(!base) throw new Error('未配置后端地址');
+  const headers={'Content-Type':'application/json'};
+  if(state.user&&state.user.token) headers['Authorization']='Bearer '+state.user.token;
+  const r=await fetch(base+pathname, Object.assign({headers}, opts||{}));
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw new Error((j&&j.error)||('HTTP '+r.status));
+  return j;
+}
+function showAuth(){ const el=$('authOverlay'); if(el) el.classList.remove('hidden'); }
+function hideAuth(){ const el=$('authOverlay'); if(el) el.classList.add('hidden'); }
+async function doAuth(mode){
+  const user=$('authUser').value.trim();
+  const pass=$('authPass').value;
+  const server=$('authServer').value.trim();
+  const msg=$('authMsg');
+  if(!user||!pass){ msg.textContent='请填写用户名和密码'; return; }
+  if(server){ state.serverBase=server; localStorage.setItem('cr_server', server); }
+  msg.textContent='处理中…';
+  try{
+    const j=await api('/api/'+mode, {method:'POST', body:JSON.stringify({user,pass})});
+    state.user={name:j.user, token:j.token};
+    localStorage.setItem('cr_user', JSON.stringify(state.user));
+    msg.textContent='';
+    await pullState();
+    hideAuth();
+    goStep(1);
+    toast(mode==='register' ? '注册成功，开始吧！' : '欢迎回来，'+j.user);
+  }catch(e){ msg.textContent=e.message||'失败'; }
+}
+function logout(){
+  state.user=null; localStorage.removeItem('cr_user');
+  showAuth();
+}
+function oauthLogin(provider){
+  const server=$('authServer').value.trim();
+  if(server){ state.serverBase=server; localStorage.setItem('cr_server', server); }
+  const base=apiBase();
+  if(!base){ toast('请先填写后端地址'); return; }
+  window.location.href = base + '/api/oauth/' + provider + '/start';
+}
+async function pullState(){
+  try{
+    const j=await api('/api/state');
+    if(j && j.state){
+      const o=j.state;
+      if(o.profile) state.profile=o.profile;
+      if(o.dayIndex!=null) state.dayIndex=o.dayIndex;
+      if(o.todayMeals) state.todayMeals=o.todayMeals;
+      if(o.dayRecords) state.dayRecords=o.dayRecords;
+      if(o.startDate) state.startDate=o.startDate;
+      if(o.balance) state.balance=o.balance;
+      if(o.earnedSurplus!=null) state.earnedSurplus=o.earnedSurplus;
+      if(o.earnedLog) state.earnedLog=o.earnedLog;
+      if(o.dislikes) state.dislikes=o.dislikes;
+      if(o.wants) state.wants=o.wants;
+      if(o.upgradeDays) state.upgradeDays=o.upgradeDays;
+    }
+  }catch(e){}
+}
+function stateSnapshot(){
+  return {
+    profile:state.profile, dayIndex:state.dayIndex, todayMeals:state.todayMeals,
+    dayRecords:state.dayRecords, startDate:state.startDate, balance:state.balance,
+    earnedSurplus:state.earnedSurplus, earnedLog:state.earnedLog,
+    dislikes:state.dislikes, wants:state.wants, upgradeDays:state.upgradeDays
+  };
+}
+let _saveTimer=null;
+function pushState(){ if(state.user) api('/api/state',{method:'POST',body:JSON.stringify({state:stateSnapshot()})}).catch(()=>{}); }
+function pushStateDebounced(){ if(!state.user) return; clearTimeout(_saveTimer); _saveTimer=setTimeout(pushState, 800); }
+// 给食谱提意见：大模型理解 + 记入忌口
+async function submitRecipeFeedback(){
+  const el=$('fbInput'); const text=((el&&el.value)||'').trim();
+  if(!text){ toast('说点什么，如：吃腻面条了'); return; }
+  toast('AI 正在理解你的意见…');
+  try{
+    const j=await api('/api/recipe-feedback',{method:'POST',body:JSON.stringify({
+      text, meals:(state.plan?state.plan.meals:[]), dislikes:state.dislikes, wants:state.wants
+    })});
+    // 忌口与想吃相互抵消（以最新一次为准）
+    (j.avoid||[]).forEach(w=>{ w=String(w).trim(); if(!w) return;
+      state.wants=state.wants.filter(x=>!(x.includes(w)||w.includes(x)));
+      if(state.dislikes.indexOf(w)<0) state.dislikes.push(w);
+    });
+    (j.want||[]).forEach(w=>{ w=String(w).trim(); if(!w) return;
+      state.dislikes=state.dislikes.filter(x=>!(x.includes(w)||w.includes(x)));
+      if(state.wants.indexOf(w)<0) state.wants.push(w);
+    });
+    if(el) el.value='';
+    // 想吃的附近菜单没有 → 去地图搜索附近有没有
+    const misses=state.wants.filter(w=> !state.restaurants.some(sh=> sh.menu && sh.menu.some(m=> wantMatch(m.n,w))));
+    if(misses.length){
+      toast('正在地图搜索附近「'+misses.join('、')+'」…');
+      for(const w of misses){ try{ await searchWant(w); }catch(e){} }
+    }
+    persistState();
+    maybeRefreshPlan();
+    toast(j.note ? ('已记下：'+j.note) : '已记下你的意见，食谱会据此调整');
+  }catch(e){ toast('提交失败：'+(e.message||e)); }
+}
+// 升级行为追踪 + 触发提意见
+function todayUpgradeCount(){ return ['早','午','晚'].filter(t=>state.todayMeals[t]&&state.todayMeals[t].upgraded).length; }
+function bumpUpgradeDay(){
+  const d=state.startDate?new Date(state.startDate+'T00:00:00'):new Date();
+  d.setDate(d.getDate()+state.dayIndex);
+  const iso=d.toISOString().slice(0,10);
+  if(state.upgradeDays.indexOf(iso)<0) state.upgradeDays.push(iso);
+}
+function consecutiveUpgradeDays(){
+  const ds=state.upgradeDays.slice().sort();
+  let streak=0, prev=null;
+  ds.forEach(d=>{ if(prev){ const diff=Math.round((new Date(d)-new Date(prev))/86400000); streak=(diff===1)?streak+1:1; } else streak=1; prev=d; });
+  return streak;
+}
+function checkFeedbackTrigger(){
+  if(todayUpgradeCount()>=2 || consecutiveUpgradeDays()>=3){
+    const el=$('fbInput'); if(el){ el.focus(); el.placeholder='改得有点多，给食谱提提意见？'; }
+    toast('近期改食谱有点频繁，给食谱提提意见？');
+  }
+}
+function syncProfile(){
+  const p=state.profile;
+  p.weight=+$('pWeight').value||100; p.goal=+$('pGoal').value||75; p.durationMonths=+$('pDuration').value||6;
+  p.height=+$('pHeight').value||170; p.age=+$('pAge').value||30;
+  p.taste=$('pTaste').value; p.exercise=$('pExercise').value; p.eat=$('pEat').value;
+}
+function finishProfile(){
+  syncProfile();
+  localStorage.setItem('cr_profile', JSON.stringify(state.profile));
+  goStep(1);
+}
+function clearAllData(){
+  if(!confirm('确定清空所有每日记录、余卡、画像和偏好设置吗？此操作不可撤销。')) return;
+  localStorage.removeItem('cr_profile');
+  localStorage.removeItem('cr_state');
+  state.profile={weight:100,goal:75,durationMonths:6,height:170,age:30,taste:'爱吃烤肉',sports:['跑步'],exercise:'愿意多走多跑',eat:'正常吃'};
+  state.dayIndex=0; state.todayMeals={早:null,午:null,晚:null}; state.dayRecords=[];
   state.balance={deposit:0,loan:0,history:[]};
+  state.earnedSurplus=0; state.earnedLog=[];
+  state.dislikes=[]; state.wants=[]; state.upgradeDays=[];
+  state.startDate=new Date().toISOString().slice(0,10);
+  state.plan=null; state.recommended=[];
+  $('pWeight').value=100; $('pGoal').value=75; $('pDuration').value=6; $('pHeight').value=170; $('pAge').value=30;
+  $('pTaste').value='爱吃烤肉'; $('pExercise').value='愿意多走多跑'; $('pEat').value='正常吃';
+  renderSportChips();
+  persistState();
+  if(state.user) pushState();
+  setSteps(0);
+  toast('已清空，重新开始');
+}
+function persistState(){
+  try{
+    localStorage.setItem('cr_state', JSON.stringify({
+      dayIndex:state.dayIndex, balance:state.balance, todayMeals:state.todayMeals,
+      dayRecords:state.dayRecords, startDate:state.startDate,
+      earnedSurplus:state.earnedSurplus, earnedLog:state.earnedLog,
+      dislikes:state.dislikes, wants:state.wants, upgradeDays:state.upgradeDays
+    }));
+  }catch(e){}
+  pushStateDebounced();
+}
+function normalizeBalance(){
+  const repay=Math.min(state.balance.deposit, state.balance.loan);
+  if(repay>0){ state.balance.deposit-=repay; state.balance.loan-=repay; }
+}
+function loadState(){
+  try{
+    const s=localStorage.getItem('cr_state');
+    if(s){ const o=JSON.parse(s);
+      state.dayIndex=o.dayIndex||0;
+      if(o.balance) state.balance=o.balance;
+      if(o.todayMeals) state.todayMeals=o.todayMeals;
+      if(o.dayRecords) state.dayRecords=o.dayRecords;
+      if(o.startDate) state.startDate=o.startDate;
+      if(o.earnedSurplus!=null) state.earnedSurplus=o.earnedSurplus;
+      if(o.earnedLog) state.earnedLog=o.earnedLog;
+      if(o.dislikes) state.dislikes=o.dislikes;
+      if(o.wants) state.wants=o.wants;
+      if(o.upgradeDays) state.upgradeDays=o.upgradeDays;
+    }
+  }catch(e){}
+  normalizeBalance();
+}
+function nextDay(){
+  const pl=state.plan||buildPlan();
+  const meals={};
+  ['早','午','晚'].forEach(t=>{
+    const r=state.todayMeals[t];
+    const meal=pl.meals.find(m=>m.tag===t);
+    if(r&&r.upgraded) meals[t]={upgraded:true, intake:r.intake, surplus:r.surplus||0, burn:r.burn||0, shop:r.shop||''};
+    else meals[t]={upgraded:false, intake:meal?meal.kcal:0, surplus:0, burn:0};
+  });
+  const daySurplus=['早','午','晚'].reduce((s,t)=>s+(meals[t].surplus||0),0);
+  const dayEx=(state.earnedSurplus||0)+['早','午','晚'].reduce((s,t)=>s+(meals[t].burn||0),0);
+  state.dayRecords.push({day:state.dayIndex+1, meals, earnedSurplus:state.earnedSurplus, earnedLog:state.earnedLog.slice(), daySurplus, dayEx});
+  state.dayIndex++;
+  state.todayMeals={早:null,午:null,晚:null};
   state.earnedSurplus=0; state.earnedLog=[];
   state.order={items:[],extras:[],intake:0};
   state.trip={mode:'walk',start:0,elapsed:0,burn:0,speed:0,met:0};
   state.selected=null; state.distance=0;
   state.upgradeFrom=null; state.photoNote='';
-  $('startBtn').disabled=false; $('arriveBtn').classList.add('hidden');
-  goStep(0);
+  persistState();
+  renderPlan();
+  toast(`已进入第 ${state.dayIndex+1} 天`);
 }
 function renderSportChips(){
   const box=$('pSportChips'); box.innerHTML='';
@@ -1286,14 +1877,18 @@ function init(){
   $('aiBase').onchange=e=>{ state.aiBase=e.target.value.trim(); localStorage.setItem('aiBase', state.aiBase); };
   $('connectBtn').onclick=connectAMap;
   $('amapKey').onkeydown=e=>{ if(e.key==='Enter') connectAMap(); };
-  const sync=()=>{ const p=state.profile;
-    p.weight=+$('pWeight').value||100; p.goal=+$('pGoal').value||75; p.durationMonths=+$('pDuration').value||6;
-    p.height=+$('pHeight').value||170; p.age=+$('pAge').value||30;
-    p.taste=$('pTaste').value; p.exercise=$('pExercise').value; p.eat=$('pEat').value;
-  };
-  sync();
+
+  loadState();
+  if(!state.startDate){ state.startDate=new Date().toISOString().slice(0,10); persistState(); }
+  const prof=localStorage.getItem('cr_profile');
+  if(prof){ try{ state.profile=JSON.parse(prof); }catch(e){} }
+  if(!Array.isArray(state.profile.sports)||!state.profile.sports.length) state.profile.sports=['跑步'];
+  $('pWeight').value=state.profile.weight; $('pGoal').value=state.profile.goal;
+  $('pDuration').value=state.profile.durationMonths; $('pHeight').value=state.profile.height; $('pAge').value=state.profile.age;
+  $('pTaste').value=state.profile.taste; $('pExercise').value=state.profile.exercise; $('pEat').value=state.profile.eat;
+
   renderSportChips();
-  ['pWeight','pGoal','pDuration','pHeight','pAge','pTaste','pExercise','pEat'].forEach(id=>{ $(id).onchange=sync; $(id).oninput=sync; });
+  ['pWeight','pGoal','pDuration','pHeight','pAge','pTaste','pExercise','pEat'].forEach(id=>{ $(id).onchange=syncProfile; $(id).oninput=syncProfile; });
   const sel=$('eSport');
   ACTIVITIES.forEach(([name,met])=>{ const o=document.createElement('option'); o.value=name; o.dataset.met=met; o.textContent=name+'（约 '+met+' MET）'; sel.appendChild(o); });
   const esel=$('extraSelect');
@@ -1302,9 +1897,24 @@ function init(){
   $('extraPhotoInput').onchange=e=>{ if(e.target.files&&e.target.files[0]) handleExtraPhoto(e.target.files[0]); };
   $('distFilter').onchange=e=>{ state.distFilter=e.target.value; renderShops(); renderMockMap(); addMarkers(); };
   if($('amapKey').value.trim()) setTimeout(connectAMap, 300);
+
+  // OAuth 回调带回的 token（可选）
+  const qp=new URLSearchParams(location.search);
+  if(qp.get('oauth_token')){
+    state.user={name: qp.get('oauth_user')||'用户', token: qp.get('oauth_token')};
+    localStorage.setItem('cr_user', JSON.stringify(state.user));
+    try{ history.replaceState(null,'',location.pathname); }catch(e){}
+  }
+  // 已登录则静默从云端同步；未登录直接用本地数据（不再弹登录框）
+  const savedServer=localStorage.getItem('cr_server');
+  if(savedServer){ state.serverBase=savedServer; }
+  const savedUser=localStorage.getItem('cr_user');
+  if(savedUser){ try{ state.user=JSON.parse(savedUser); }catch(e){} }
+  hideAuth();
+  const enter=()=>{ if(state.profile && state.profile.weight) goStep(1); else setSteps(0); };
+  if(state.user){ pullState().then(enter).catch(enter); } else { enter(); }
 }
 init();
-setSteps(0);
 </script>
 </body>
 </html>

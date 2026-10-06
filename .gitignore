@@ -19,3 +19,10 @@ desktop.ini
 
 # 密钥
 zhipu.key
+oauth.json
+
+# 用户数据
+data/
+
+# 其它项目（勿提交）
+careersafari-app/
