@@ -453,23 +453,26 @@ const SAMPLE_SHOPS = [
   {name:'炸鸡汉堡',    dish:'香辣炸鸡套餐', kcal:1200, menu:[
     {n:'香辣炸鸡套餐', k:1200},{n:'原味鸡腿堡', k:640},{n:'薯条中份', k:340},{n:'无糖可乐', k:0}]},
   {name:'韩式烤肉',    dish:'五花肉拼盘', kcal:1450, menu:[
-    {n:'五花肉100g', k:508},{n:'牛里脊100g', k:125},{n:'生菜包一份', k:60},{n:'石锅拌饭', k:650},{n:'冷面', k:400}]},
+    {n:'五花肉100g', k:508},{n:'牛里脊100g', k:125},{n:'生菜卷一份', k:60},{n:'石锅拌饭', k:650},{n:'冷面', k:400}]},
   {name:'重庆火锅',    dish:'麻辣锅底+涮菜', kcal:1800, menu:[
     {n:'麻辣锅底', k:800},{n:'肥牛卷100g', k:350},{n:'蔬菜拼盘', k:90},{n:'豆皮', k:120}]},
 ];
 const MENU_DB = {
-  '烤肉': {menu:[{n:'牛里脊(100g)',k:125},{n:'烤鸡腿肉(100g)',k:165},{n:'烤蘑菇',k:80},{n:'生菜包(一份)',k:60},{n:'辣白菜',k:30},{n:'韩式冷面',k:400},{n:'猪五花(100g)',k:508},{n:'石锅拌饭',k:650}]},
-  '火锅': {menu:[{n:'虾滑(100g)',k:110},{n:'清汤锅底',k:120},{n:'蔬菜拼盘',k:90},{n:'豆皮(100g)',k:120},{n:'粉丝(100g)',k:335},{n:'肥牛卷(100g)',k:350},{n:'麻辣锅底',k:800}]},
-  '面馆': {menu:[{n:'凉拌黄瓜',k:60},{n:'茶叶蛋',k:80},{n:'素汤面',k:400},{n:'葱油拌面',k:540},{n:'清汤牛肉面',k:550},{n:'炸酱面',k:620}]},
+  '早餐': {menu:[{n:'小米粥',k:90},{n:'皮蛋瘦肉粥',k:180},{n:'八宝粥',k:160},{n:'无糖豆浆',k:60},{n:'水煮蛋',k:80},{n:'茶叶蛋',k:80},{n:'素菜包',k:160},{n:'鲜肉包',k:250},{n:'全麦馒头',k:180},{n:'鸡蛋灌饼',k:300},{n:'煎饼果子',k:350},{n:'三明治',k:320},{n:'纯牛奶',k:130},{n:'无糖酸奶',k:90},{n:'燕麦牛奶',k:220}]},
+  '面馆': {menu:[{n:'凉拌黄瓜',k:60},{n:'茶叶蛋',k:80},{n:'青菜面',k:380},{n:'素汤面',k:400},{n:'荞麦冷面',k:360},{n:'葱油拌面',k:540},{n:'清汤牛肉面',k:550},{n:'番茄鸡蛋面',k:480},{n:'炸酱面',k:620},{n:'酸辣粉',k:450}]},
+  '轻食': {menu:[{n:'蔬菜汤',k:90},{n:'田园蔬菜沙拉',k:150},{n:'希腊酸奶杯',k:180},{n:'藜麦饭团',k:300},{n:'鸡胸肉沙拉',k:320},{n:'全麦鸡胸三明治',k:330},{n:'烤鸡藜麦碗',k:380},{n:'牛油果虾仁碗',k:410}]},
+  '中餐': {menu:[{n:'紫菜蛋花汤',k:70},{n:'番茄蛋汤',k:90},{n:'白灼虾(100g)',k:99},{n:'蒜蓉西兰花',k:120},{n:'清炒时蔬',k:150},{n:'木耳炒山药',k:160},{n:'清蒸鲈鱼',k:200},{n:'米饭(一碗)',k:230},{n:'青椒肉丝',k:320},{n:'宫保鸡丁',k:380},{n:'红烧肉(100g)',k:520}]},
+  '家常菜': {menu:[{n:'凉拌木耳',k:80},{n:'西红柿炒蛋',k:180},{n:'清蒸鸡胸',k:165},{n:'冬瓜排骨汤',k:200},{n:'杂粮饭(一碗)',k:200},{n:'白切鸡(100g)',k:200},{n:'红烧鲫鱼',k:260},{n:'手撕包菜',k:110}]},
+  '日料': {menu:[{n:'味噌汤',k:60},{n:'茶碗蒸',k:120},{n:'三文鱼刺身(100g)',k:140},{n:'蔬菜寿司卷',k:280},{n:'荞麦面(冷)',k:320},{n:'鳗鱼饭',k:600}]},
+  '烤肉': {menu:[{n:'辣白菜',k:30},{n:'生菜卷(一份)',k:60},{n:'烤蘑菇',k:80},{n:'牛里脊(100g)',k:125},{n:'烤鸡腿肉(100g)',k:165},{n:'韩式冷面',k:400},{n:'猪五花(100g)',k:508},{n:'石锅拌饭',k:650}]},
+  '火锅': {menu:[{n:'蔬菜拼盘',k:90},{n:'虾滑(100g)',k:110},{n:'清汤锅底',k:120},{n:'豆皮(100g)',k:120},{n:'粉丝(100g)',k:335},{n:'肥牛卷(100g)',k:350},{n:'麻辣锅底',k:800}]},
   '奶茶': {menu:[{n:'黑咖啡(无糖)',k:5},{n:'无糖绿茶',k:20},{n:'芋圆豆花',k:380},{n:'珍珠奶茶(少糖)',k:450},{n:'黑糖鲜奶',k:520}]},
-  '轻食': {menu:[{n:'蔬菜汤',k:90},{n:'希腊酸奶杯',k:180},{n:'藜麦饭团',k:300},{n:'鸡胸肉沙拉',k:320},{n:'牛油果虾仁碗',k:410}]},
-  '快餐': {menu:[{n:'无糖可乐',k:0},{n:'玉米杯',k:120},{n:'薯条(中)',k:340},{n:'原味鸡腿堡',k:640},{n:'香辣炸鸡套餐',k:1200}]},
-  '咖啡': {menu:[{n:'美式(无糖)',k:5},{n:'卡布奇诺',k:150},{n:'拿铁',k:180},{n:'牛角包',k:280},{n:'三明治',k:350}]},
-  '中餐': {menu:[{n:'番茄蛋汤',k:90},{n:'白灼虾(100g)',k:99},{n:'清炒时蔬',k:150},{n:'米饭(一碗)',k:230},{n:'宫保鸡丁',k:380},{n:'红烧肉(100g)',k:520}]},
+  '快餐': {menu:[{n:'无糖可乐',k:0},{n:'玉米杯',k:120},{n:'蔬菜沙拉杯',k:120},{n:'薯条(中)',k:340},{n:'原味鸡腿堡',k:640},{n:'香辣炸鸡套餐',k:1200}]},
+  '咖啡': {menu:[{n:'美式(无糖)',k:5},{n:'卡布奇诺',k:150},{n:'拿铁',k:180},{n:'牛角包',k:280},{n:'全麦三明治',k:330}]},
 };
 function matchMenu(name, type){
   const s=(name||'')+(type||'');
-  const rules=[['烤肉','烤肉'],['烧烤','烤肉'],['火锅','火锅'],['麻辣烫','火锅'],['串串','火锅'],['拉面','面馆'],['面','面馆'],['米线','面馆'],['粉','面馆'],['饺子','面馆'],['奶茶','奶茶'],['咖啡','咖啡'],['沙拉','轻食'],['轻食','轻食'],['三明治','轻食'],['汉堡','快餐'],['炸鸡','快餐'],['快餐','快餐'],['寿司','中餐'],['日料','中餐'],['川菜','中餐'],['粤菜','中餐'],['湘菜','中餐'],['小吃','中餐']];
+  const rules=[['早餐','早餐'],['早点','早餐'],['粥','早餐'],['包子','早餐'],['馒头','早餐'],['豆浆','早餐'],['油条','早餐'],['煎饼','早餐'],['包点','早餐'],['烤肉','烤肉'],['烧烤','烤肉'],['火锅','火锅'],['麻辣烫','火锅'],['串串','火锅'],['拉面','面馆'],['面','面馆'],['米线','面馆'],['粉','面馆'],['饺子','面馆'],['馄饨','面馆'],['寿司','日料'],['日本料理','日料'],['日料','日料'],['刺身','日料'],['沙拉','轻食'],['轻食','轻食'],['三明治','轻食'],['藜麦','轻食'],['奶茶','奶茶'],['咖啡','咖啡'],['汉堡','快餐'],['炸鸡','快餐'],['快餐','快餐'],['肯德基','快餐'],['麦当劳','快餐'],['川菜','家常菜'],['家常菜','家常菜'],['小炒','家常菜'],['炒菜','家常菜'],['粤菜','中餐'],['湘菜','中餐'],['酒楼','中餐'],['饭店','中餐'],['小吃','中餐']];
   for(const [w,cat] of rules){ if(s.includes(w)) return cat; }
   return '中餐';
 }
@@ -546,31 +549,32 @@ function clip01(x){ return Math.max(0, Math.min(1, x)); }
  */
 function weightLossReport(pl, D, muMeal, sigmaMeal, exerciseKC){
   const n = pl.nMeals;
-  const ex = exerciseKC || 0;           // 运动卡数之和（把概率不等式的右侧左移 ex）
+  const ex = exerciseKC || 0;           // 运动卡数之和（直接并入「真实余卡」）
   const fullKC = 7700 * pl.toLose;      // 整目标热量
   const halfKC = 7700 * pl.toLose / 2;  // 一半目标热量
 
-  const muSurp    = muMeal * n;                     // 逐餐期望累加
-  const sigmaSurp = sigmaMeal * Math.sqrt(n);       // √(Σ 每餐方差)
+  // 真实余卡 X（含运动）= 食物余卡 + 运动 ~ N(μ, σ²)
+  const muX    = muMeal * n + ex;
+  const sigmaX = sigmaMeal * Math.sqrt(n);
 
-  const pAt = t => sigmaSurp===0
-      ? (muSurp>=t?1:0)
-      : clip01(1 - normCdf((t - muSurp) / sigmaSurp));  // P(X ≥ t)
+  const pAt = t => sigmaX===0
+      ? (muX>=t?1:0)
+      : clip01(1 - normCdf((t - muX) / sigmaX));  // P(X ≥ t)
 
-  const thinProb = pAt(-fullKC - ex);  // 会瘦： 真实余卡 > -(目标 + 运动)
-  const halfProb = pAt(-halfKC - ex);  // 达标一半
-  const hitProb  = pAt(0 - ex);        // 达标： 真实余卡 > -运动
+  const thinProb = pAt(-fullKC);  // 会瘦： 真实余卡(含运动) > −整目标
+  const halfProb = pAt(-halfKC);  // 达标一半
+  const hitProb  = pAt(0);        // 达标： 真实余卡(含运动) > 0
 
-  const lo = muSurp - 1.96*sigmaSurp;
-  const hi = muSurp + 1.96*sigmaSurp;
+  const lo = muX - 1.96*sigmaX;
+  const hi = muX + 1.96*sigmaX;
   const kg = x => Math.max(0, x/7700 + pl.toLose);
 
   return {
     hitProb,
     halfProb,
     thinProb,
-    // 区间整体平移 +运动（与概率口径一致：减重 = toLose + (X+运动)/7700）
-    conf95_kg: [ kg(lo + ex), kg(hi + ex) ]
+    muX, sigmaX,                    // 供报告展示
+    conf95_kg: [ kg(lo), kg(hi) ]   // 减重 = toLose + X/7700
   };
 }
 
@@ -647,7 +651,7 @@ function buildPlan(){
   ], exercise };
 }
 /* 餐次适配：早餐只推早餐类，午/晚不推纯饮品/点心 */
-const BF_KW=/蛋|粥|豆浆|牛奶|酸奶|麦片|燕麦|三明治|吐司|面包|牛角|贝果|煎饼|油条|馒头|花卷|肠粉|小笼|饺|馄饨|咖啡|拿铁|美式|卡布|水果|羹|藜麦/;
+const BF_KW=/蛋|粥|豆浆|牛奶|酸奶|麦片|燕麦|三明治|吐司|面包|牛角|贝果|煎饼|包|饼|油条|馒头|花卷|肠粉|小笼|饺|馄饨|咖啡|拿铁|美式|卡布|水果|羹|藜麦/;
 const LIGHT_ONLY=/可乐|绿茶|奶茶|鲜奶|豆花|咖啡|拿铁|美式|卡布|豆浆|果汁|牛角|酸奶|麦片|燕麦|薯条/;
 function mealFits(tag, name){
   const n=String(name||'');
@@ -696,9 +700,14 @@ function buildRecommendations(pl){
   if(!state.restaurants.length) return map;
   const dis=state.dislikes||[];
   const blocked=n=>dis.some(w=>w&&n.indexOf(w)>=0);
-  let pool=[];
-  state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>{ if(!blocked(d.n)) pool.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist}); }); });
-  if(!pool.length) state.restaurants.forEach(sh=>{ sh.menu.forEach(d=>pool.push({shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist})); });
+  // 按菜名去重：每道菜只留最近的一家店，保证每日变化是「换菜」而不只是「换店」
+  const byDish={};
+  state.restaurants.forEach(sh=>{ (sh.menu||[]).forEach(d=>{ if(blocked(d.n)) return;
+    const cur=byDish[d.n];
+    if(!cur || sh.dist<cur.dist) byDish[d.n]={shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist};
+  }); });
+  let pool=Object.values(byDish);
+  if(!pool.length){ state.restaurants.forEach(sh=>{ (sh.menu||[]).forEach(d=>{ if(!byDish[d.n]) byDish[d.n]={shop:sh.name, dish:d.n, kcal:d.k, dist:sh.dist}; }); }); pool=Object.values(byDish); }
   if(!pool.length) return map;
 
   // 「想吃」：每个偏好一天只占用一顿（选最合适、热量最接近的餐次）
@@ -1491,7 +1500,8 @@ function renderRank(){
   const rep=weightLossReport({toLose:pl.toLose, nMeals:days}, 0, pl.budget-dailyIntake, dailyStd, exProj);
   const pct=x=>(x*100).toFixed(1)+'%';
   const pc=x=> x>0.7?'var(--green2)':(x>0.4?'var(--accent)':'var(--danger)');
-  const z=t=>((t-muX)/sigmaA).toFixed(2);
+  const muXi=muX+exProj;   // 真实余卡（含运动）
+  const z=t=>((t-muXi)/sigmaA).toFixed(2);
 
   // 今日总结：余卡 = 食物余卡 + 运动
   const todayFood=['早','午','晚'].reduce((s,t)=>{
@@ -1526,13 +1536,13 @@ function renderRank(){
     <div class="calc">Σσ² = Σ(0.3 × μᵢ)² = ${Math.round(sumVar)} 千卡²</div>
     <div class="calc">投影到 ${days} 天：实际总摄入 A ~ N(${muA}, ${sigmaA}²)</div>
     <div class="calc">计划总摄入 = ${pl.budget} × ${days} = ${plannedIntake} 千卡</div>
-    <div class="calc">真实余卡 X（不含运动）= 计划 − 实际 ~ N(${muX}, ${sigmaA}²)</div>
-    <div class="calc">运动卡数之和 = ${exProj} 千卡（计入不等式右侧）</div>
-    <div class="calc">达标 P(X &gt; ${-exProj}) = 1−Φ(${z(-exProj)}) = ${pct(rep.hitProb)}</div>
-    <div class="calc">减半 P(X &gt; ${Math.round(-7700*pl.toLose/2-exProj)}) = 1−Φ(${z(-7700*pl.toLose/2-exProj)}) = ${pct(rep.halfProb)}</div>
-    <div class="calc">会瘦 P(X &gt; ${Math.round(-7700*pl.toLose-exProj)}) = 1−Φ(${z(-7700*pl.toLose-exProj)}) = ${pct(rep.thinProb)}</div>
-    <div class="calc">期望减重 = ${pl.toLose} + (${muX} + 运动 ${exProj}) ÷ 7700 = ${(pl.toLose+(muX+exProj)/7700).toFixed(1)} kg</div>
-    <div class="calc">95% = ${muX} ± 1.96×${sigmaA}；减重区间整体 + 运动 ${(exProj/7700).toFixed(2)}kg → ${rep.conf95_kg[0].toFixed(1)} ~ ${rep.conf95_kg[1].toFixed(1)} kg</div>`;
+    <div class="calc">运动卡数之和 = ${exProj} 千卡</div>
+    <div class="calc">真实余卡 X（含运动）= 计划 − 实际 + 运动 ~ N(${muXi}, ${sigmaA}²)</div>
+    <div class="calc">达标 P(X &gt; 0) = 1−Φ(${z(0)}) = ${pct(rep.hitProb)}</div>
+    <div class="calc">减半 P(X &gt; ${Math.round(-7700*pl.toLose/2)}) = 1−Φ(${z(-7700*pl.toLose/2)}) = ${pct(rep.halfProb)}</div>
+    <div class="calc">会瘦 P(X &gt; ${Math.round(-7700*pl.toLose)}) = 1−Φ(${z(-7700*pl.toLose)}) = ${pct(rep.thinProb)}</div>
+    <div class="calc">期望减重 = ${pl.toLose} + ${muXi} ÷ 7700 = ${(pl.toLose+muXi/7700).toFixed(1)} kg</div>
+    <div class="calc">95% = ${muXi} ± 1.96×${sigmaA} → 减重区间 ${rep.conf95_kg[0].toFixed(1)} ~ ${rep.conf95_kg[1].toFixed(1)} kg</div>`;
   const list=$('rankList'); list.innerHTML='';
   appendRankRow(list, me, 1, true, analysisHtml, '累计');
 
